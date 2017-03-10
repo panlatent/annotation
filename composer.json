@@ -1,0 +1,24 @@
+{
+    "name": "panlatent/annotation",
+    "description": "Parsing PHPDoc style annotations from comments",
+    "type": "library",
+    "require": {
+        "php": ">=5.5",
+        "panlatent/boost": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "panlatent",
+            "email": "panlatent@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Panlatent\\Annotation\\": "src/"
+        }
+    }
+}
