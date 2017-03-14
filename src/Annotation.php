@@ -2,22 +2,24 @@
 
 namespace Panlatent\Annotation;
 
-class Annotation
+use Panlatent\Boost\ReadOnlyStorage;
+
+class Annotation extends ReadOnlyStorage
 {
     protected $title = '';
 
-    protected $attributes = [];
-
+    /**
+     * Annotation constructor.
+     *
+     * @param string $content
+     */
     public function __construct($content)
     {
+        parent::__construct();
+
         $content = $this->getPhpDocStyleContent($content);
         $lines =  $this->splitCleanLine($content);
         $this->setAttributesAndTitle($lines);
-    }
-
-    public function get($name)
-    {
-        return $this->attributes[$name];
     }
 
     /**
@@ -39,15 +41,10 @@ class Annotation
     
     protected function splitCleanLine($content)
     {
-        $content = preg_replace('#^\s*\*?\s*(.*?)\s*$#m', '\1', $content);
-        $content = str_replace(["\n", "\r"], "\n", $content);
-        
-        return preg_split('#\n+#', $content);
-    }
+        $content = preg_replace('#^\s*\*?\s*([^\s].*?)$#m', '\1', $content);
+        $content = str_replace(["\r\n", "\r"], "\n", $content);
 
-    protected function getPhpDocStyleTitle()
-    {
-        // @TODO
+        return preg_split('#\s*\n+\s*#', $content);
     }
 
     protected function setAttributesAndTitle($lines)
@@ -57,15 +54,15 @@ class Annotation
         for ($i = 0; $i < $count; ++$i) {
             $line = $lines[$i];
             if (0 === strncmp($line, '@', 1)) {
-                preg_match('#@([a-z][a-zA-Z0-9_-]*)\s*(.*)#', $line, $pMatch);
-                $lastName = $name = $pMatch[1];
-                $value = $pMatch[2];
-                $this->attributes[$name] = $value;
+                preg_match('#@([a-z][a-zA-Z0-9_-]*)\s*(.*)#', $line, $match);
+                $lastName = $match[1];
+                $value = $match[2];
+                $this->storage[$lastName] = $value;
             } else {
-                if (empty($this->attributes)) {
+                if (empty($this->storage)) {
                     $this->title .= $line;
                 } else {
-                    $this->attributes[$lastName] .= $line;
+                    $this->storage[$lastName] .= $line;
                 }
             }
         }
