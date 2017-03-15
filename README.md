@@ -5,4 +5,7 @@
 [![Latest Unstable Version](https://poser.pugx.org/panlatent/annotation/v/unstable.svg)](https://packagist.org/packages/panlatent/annotation) 
 [![License](https://poser.pugx.org/panlatent/annotation/license.svg)](https://packagist.org/packages/panlatent/annotation)
 
-Parsing PHPDoc style annotations from comments
+Parsing PHPDoc style annotations from comments.
+
+Annotation是一个PHPDoc风格注释解析器, 它能从注释里面解析PHPDoc注释元素并封装成对应的类. 为了保证对PHPDoc注释解析的一致性,
+Annotation从遵循[PSR-5 PHPDoc草案](https://github.com/phpDocumentor/fig-standards/blob/master/proposed/phpdoc.md).
