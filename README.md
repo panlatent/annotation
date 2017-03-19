@@ -12,4 +12,4 @@ Annotation从遵循[PSR-5 PHPDoc草案](https://github.com/phpDocumentor/fig-sta
 
 ## License
 
-The Container is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+The Annotation is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
