@@ -7,13 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation;
+namespace Panlatent\Annotation\Tag;
 
-abstract class Annotation
+class InlineInheritDocTag extends InheritDocTag
 {
-    protected $phpDoc;
 
-    public function __construct($docComment)
-    {
-    }
 }

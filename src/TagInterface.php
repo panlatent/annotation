@@ -9,11 +9,11 @@
 
 namespace Panlatent\Annotation;
 
-abstract class Annotation
+interface TagInterface
 {
-    protected $phpDoc;
-
-    public function __construct($docComment)
-    {
-    }
+    const TAG_SING = '@';
+    /**
+     * @return string
+     */
+    public function getName();
 }

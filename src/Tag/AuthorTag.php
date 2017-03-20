@@ -7,13 +7,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation;
+namespace Panlatent\Annotation\Tag;
 
-abstract class Annotation
+use Panlatent\Annotation\Tag;
+
+class AuthorTag extends Tag
 {
-    protected $phpDoc;
-
-    public function __construct($docComment)
-    {
-    }
+    protected $name = 'author';
 }

@@ -7,13 +7,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation;
+namespace Panlatent\Annotation\Tag;
 
-abstract class Annotation
+use Panlatent\Annotation\Tag;
+
+class SpecializationTag extends Tag // 专业化标签 @see:unit-test \Mapping\EntityTest::testGetId
 {
-    protected $phpDoc;
-
-    public function __construct($docComment)
-    {
-    }
+    protected $specialization;
 }

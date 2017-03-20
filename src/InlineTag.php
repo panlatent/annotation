@@ -9,11 +9,7 @@
 
 namespace Panlatent\Annotation;
 
-abstract class Annotation
+class InlineTag extends Tag
 {
-    protected $phpDoc;
 
-    public function __construct($docComment)
-    {
-    }
 }
