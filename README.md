@@ -7,8 +7,11 @@
 
 Parsing PHPDoc style annotations from comments.
 
-Annotation是一个PHPDoc风格注释解析器, 它能从注释里面解析PHPDoc注释元素并封装成对应的类. 为了保证对PHPDoc注释解析的一致性,
-Annotation从遵循[PSR-5 PHPDoc草案](https://github.com/phpDocumentor/fig-standards/blob/master/proposed/phpdoc.md).
+Annotation 是一个 PHPDoc 风格注释解析器，它能从注释里面解析 PHPDoc 注释元素并封装成对应的类。为了保证对 PHPDoc 注释解析的一致性，
+Annotation 遵循 [PSR-5 PHPDoc草案](https://github.com/phpDocumentor/fig-standards/blob/master/proposed/phpdoc.md)。
+与其他大多数库不同，它的解析器通过词法分析来解析 PHPDoc 。
+
+它的目的并不是根据注释生成文档，而是帮助用户轻松的获取 PHPDoc 注释中包含的信息。
 
 ## License
 
