@@ -7,9 +7,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-use Panlatent\Annotation\Parser;
+namespace Panlatent\Annotation\Parser\Token;
 
-class ParserTest extends PHPUnit_Framework_TestCase
+use Panlatent\Annotation\Tag;
+
+class TagArgument extends Tag
 {
 
 }

@@ -9,26 +9,31 @@
 
 namespace Panlatent\Annotation\Parser;
 
-use Exception;
-
 class SyntaxException extends Exception
 {
     protected $syntaxLine;
 
     protected $syntaxColumn;
 
-    public function __construct($message = "", $line, $column, $code = 0, \Exception $previous = null)
+    protected $syntaxContext;
+
+    /**
+     * SyntaxException constructor.
+     *
+     * @param string                                               $message
+     * @param \Panlatent\Annotation\Parser\SyntaxPositionInterface $position
+     * @param int                                                  $code
+     * @param \Exception|null                                      $previous
+     * @internal param \Panlatent\Annotation\Parser\CharacterStream $stream
+     */
+    public function __construct($message, SyntaxPositionInterface $position, $code = 0, \Exception $previous = null)
     {
-        $message .= ":{$line}:{$column}";
+        $this->syntaxLine = $position->getLineNumber();
+        $this->syntaxColumn = $position->getColumnNumber();
+        $this->syntaxContext = $position->getContext();
+
+        $context = $this->syntaxContext['current'];
+        $message = "$message at Line {$this->syntaxLine}, Column:{$this->syntaxColumn}. The syntax error in context: \"{$context}\"";
         parent::__construct($message, $code, $previous);
-        $this->syntaxLine = $line;
-        $this->syntaxColumn = $column;
     }
-
-    public static function factory($message, array $position, $code = 0, \Exception $previous = null)
-    {
-
-        return new static($message, $position[0], $position[1], $code, $previous);
-    }
-
 }
