@@ -9,9 +9,9 @@
 
 namespace Panlatent\Annotation\Parser\Token;
 
-use Panlatent\Annotation\Tag;
+use Panlatent\Annotation\Parser\Token;
 
-class TagArgument extends Tag
+class TagDescriptionToken extends Token
 {
 
 }

@@ -11,7 +11,7 @@ namespace Panlatent\Annotation\Parser\Token;
 
 use Panlatent\Annotation\Parser\Token;
 
-class TagDescription extends Token
+class InlineStartToken extends Token
 {
 
 }

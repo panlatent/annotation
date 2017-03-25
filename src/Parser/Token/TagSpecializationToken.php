@@ -11,7 +11,7 @@ namespace Panlatent\Annotation\Parser\Token;
 
 use Panlatent\Annotation\Tag;
 
-class TagSignature extends Tag
+class TagSpecializationToken extends Tag
 {
 
 }

@@ -9,16 +9,20 @@
 
 namespace Panlatent\Annotation\Parser;
 
+use Panlatent\Annotation\InlineTag;
 use Panlatent\Annotation\Parser\Token\DescriptionToken;
 use Panlatent\Annotation\Parser\Token\FinalToken;
+use Panlatent\Annotation\Parser\Token\InlineEndToken;
+use Panlatent\Annotation\Parser\Token\InlineStartToken;
 use Panlatent\Annotation\Parser\Token\SummaryToken;
-use Panlatent\Annotation\Parser\Token\TagArgument;
-use Panlatent\Annotation\Parser\Token\TagDescription;
+use Panlatent\Annotation\Parser\Token\TagArgumentToken;
+use Panlatent\Annotation\Parser\Token\TagDescriptionToken;
 use Panlatent\Annotation\Parser\Token\TagDetailsToken;
 use Panlatent\Annotation\Parser\Token\TagNameToken;
-use Panlatent\Annotation\Parser\Token\TagSignature;
-use Panlatent\Annotation\Parser\Token\TagSpecialization;
+use Panlatent\Annotation\Parser\Token\TagSignatureToken;
+use Panlatent\Annotation\Parser\Token\TagSpecializationToken;
 use Panlatent\Annotation\Parser\Token\TagToken;
+use Panlatent\Boost\BStack;
 
 /**
  * Class LexicalAnalyzer
@@ -78,6 +82,7 @@ class LexicalAnalyzer
     {
         $stream = new CharacterStream($docComment);
         $token = new Token();
+        $stack = new BStack();
         $status = new Status();
 
         foreach ($stream->generator() as $char) {
@@ -97,7 +102,7 @@ class LexicalAnalyzer
                         $token = TagToken::factory($stream->getPosition());
                         continue;
                     }
-                    if ("\0" != $char && ! $status->has(self::STATUS_SUMMARY)) {
+                    if ( ! $status->has(self::STATUS_SUMMARY)) {
                         $status->add(self::STATUS_SUMMARY);
                         $token = SummaryToken::factory($stream->getPosition());
                         $token->value .= $char;
@@ -119,7 +124,7 @@ class LexicalAnalyzer
                         }
                         continue;
                     }
-                    if ("\0" != $char) {
+                    if (1) {
                         $token->value .= $char;
                         continue;
                     }
@@ -133,7 +138,7 @@ class LexicalAnalyzer
                         $token = TagToken::factory($stream->getPosition());
                         continue;
                     }
-                    if ("\0" != $char) {
+                    if (1) {
                         if (empty($token->value)) {
                             if (preg_match('#\s#', $char)) {
                                 continue;
@@ -168,13 +173,13 @@ class LexicalAnalyzer
                         continue;
                     } elseif (':' == $char) {
                         yield $token;
-                        $token = new TagSpecialization();
+                        $token = new TagSpecializationToken();
                         continue;
                     }
 
                     throw new SyntaxException('Unexpected tag name', $stream);
 
-                case TagSpecialization::class:
+                case TagSpecializationToken::class: // @todo
 
                     throw new SyntaxException('Unexpected tag specialization', $stream);
 
@@ -183,31 +188,56 @@ class LexicalAnalyzer
                     if (preg_match('#\s#', $char) && empty($token->value)) {
                         continue;
                     }
-//                    if ("\n" == $char) {
-//                        yield $token;
-//                        $token = new Token();
-//                        continue;
-//                    }
-                    if ("\0" != $char) {
-                        if (empty($token->value)) {
-                            $token->setPosition($stream->getPosition());
-                        }
+
+                    if (empty($token->value)) {
+                        $token->setPosition($stream->getPosition());
+                    }
+
+                    yield $token;
+
+                    if ('{' == $char) {
+                        $token = InlineStartToken::factory($stream->getPosition());
+                        // $stack->push('{'); // (!) PUSH
+                    } elseif ('(' == $char) {
+                        $token = TagSignatureToken::factory($stream->getPosition());
+                    } else {
+                        $token = TagDescriptionToken::factory($stream->getPosition());
                         $token->value .= $char;
                     }
 
-                    throw new SyntaxException('Unexpected tag details', $stream);
+                    continue;
+                    // throw new SyntaxException('Unexpected tag details', $stream);
 
-                case TagDescription::class:
+                case TagDescriptionToken::class:
 
-                    throw new SyntaxException('Unexpected tag description', $stream);
+                    if ("\n" == $char) {
+                        $token->value .= $char;
+                        while ($stream->expected(" \t")) {
+                            $stream->skip();
+                        }
+                        if ($stream->expected('@')) {
+                            $stream->skip();
+                            yield $token;
+                            $token = TagToken::factory($stream->getPosition());
+                            continue;
+                        }
 
-                case TagSignature::class:
+                        continue;
+                    }
+
+                    $token->value .= $char;
+
+                    continue;
+
+                    // throw new SyntaxException('Unexpected tag description', $stream);
+
+                case TagSignatureToken::class:
 
                     throw new SyntaxException('Unexpected tag signature', $stream);
 
                 //case TagInline
 
-                case TagArgument::class:
+                case TagArgumentToken::class:
 
                     throw new SyntaxException('Unexpected tag argument', $stream);
             } // The Switch End.

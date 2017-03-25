@@ -11,30 +11,38 @@ namespace Panlatent\Annotation\Parser;
 
 class Preprocessor
 {
+    protected $keepPosition;
+
+    public function __construct($keepPosition = true)
+    {
+        $this->keepPosition = $keepPosition;
+    }
+
     public function check($docComment)
     {
         if ( ! preg_match('#/\*\*.*\*/#s', $docComment)) {
-            throw new Exception('Bad DocComment');
+            return false;
         }
         if (false !== strpos($docComment, "\r\n")) {
             if ( ! preg_match('#^\s*\*#um', $docComment)) {
-                throw new Exception('Bad multi line DocComment');
+                return false;
             }
         }
+
+        return true;
     }
 
     /**
      * Replace DocComment asterisk for space.
      *
      * @param string $docComment
-     * @param bool   $keepPosition
      * @return string
      */
-    public function preprocessor($docComment, $keepPosition = true)
+    public function preprocessor($docComment)
     {
         if (0 === strncmp($docComment, '/**', 3)) { //
             $docComment = substr($docComment, 3);
-            if ($keepPosition) {
+            if ($this->keepPosition) {
                 $docComment = str_repeat(' ', 3) . $docComment;
             } else {
                 $docComment = ltrim($docComment);
@@ -42,13 +50,13 @@ class Preprocessor
         }
         if ('*/' == substr($docComment, -2)) {
             $docComment = substr($docComment, 0, -2);
-            if ($keepPosition) {
+            if ($this->keepPosition) {
                 $docComment .= str_repeat(' ', 2);
             } else {
                 $docComment = rtrim($docComment);
             }
         }
-        if ($keepPosition) {
+        if ($this->keepPosition) {
             $docComment = preg_replace('#^([ \t]*)\*\*?([ \t]{0,1})#um', '\1 \2', $docComment);
         } else {
             $docComment = preg_replace('#^[ \t]*\*\*?[ \t]{0,1}#um', '', $docComment);
