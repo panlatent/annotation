@@ -110,6 +110,11 @@ class CharacterStream implements SyntaxPositionInterface
         $this->index += $number;
     }
 
+    public function getChar()
+    {
+        return $this->content[$this->index];
+    }
+
     /**
      * @return string
      */
