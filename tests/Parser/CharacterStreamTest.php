@@ -7,15 +7,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-/**
- * Annotation - Parsing PHPDoc style annotations from comments
- *
- * @author  panlatent@gmail.com
- * @link    https://github.com/panlatent/annotation
- * @license https://opensource.org/licenses/MIT
- */
-
-namespace Parser;
+namespace Tests\Parser;
 
 use Panlatent\Annotation\Parser\CharacterStream;
 use PHPUnit\Framework\TestCase;

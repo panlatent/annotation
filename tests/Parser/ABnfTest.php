@@ -7,7 +7,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Parser;
+namespace Tests\Parser;
 
 use Panlatent\Annotation\Parser\ABnf;
 use PHPUnit\Framework\TestCase;
