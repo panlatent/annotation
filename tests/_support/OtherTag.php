@@ -7,11 +7,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Tag;
+namespace Tests\_support;
 
 use Panlatent\Annotation\Tag;
 
-class NamespaceTag extends Tag
+class OtherTag extends Tag
 {
 
 }
