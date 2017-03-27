@@ -201,7 +201,7 @@ class LexicalAnalyzer
                         $token->setPosition($stream->getPosition());
                     }
 
-                    if ($receive = yield $token) {
+                    if ($receive = (yield $token)) {
                         if ($receive instanceof LexicalScanInterface) {
                             $extension = $receive->lexicalScan($token, $stream, $stack, $status);
                         } else {
