@@ -57,11 +57,11 @@ class Preprocessor
             }
         }
         if ($this->keepPosition) {
-            $docComment = preg_replace('#^([ \t]*)\*\*?([ \t]{0,1})#um', '\1 \2', $docComment);
+            $phpdoc = preg_replace('#^([ \t]*)\*\*?([ \t]{0,1})#um', '\1 \2', $docComment);
         } else {
-            $docComment = preg_replace('#^[ \t]*\*\*?[ \t]{0,1}#um', '', $docComment);
+            $phpdoc = preg_replace('#^[ \t]*\*\*?[ \t]{0,1}#um', '', $docComment);
         }
 
-        return str_replace(["\r", "\r\n"], "\n", $docComment);
+        return str_replace(["\r", "\r\n"], "\n", $phpdoc);
     }
 }
