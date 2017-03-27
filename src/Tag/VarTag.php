@@ -11,7 +11,11 @@ namespace Panlatent\Annotation\Tag;
 
 use Panlatent\Annotation\Tag;
 
-class SpecializationTag extends Tag // 专业化标签 @see:unit-test \Mapping\EntityTest::testGetId
+class VarTag extends Tag
 {
-    protected $specialization;
+    protected $type;
+
+    protected $elementName;
+
+    protected $description;
 }

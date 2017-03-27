@@ -9,7 +9,13 @@
 
 namespace Panlatent\Annotation\Tag;
 
-class InlineInheritDocTag extends InheritDocTag
-{
+use Panlatent\Annotation\Tag;
 
+class ParamTag extends Tag
+{
+    protected $type;
+
+    protected $paramName;
+
+    protected $description;
 }

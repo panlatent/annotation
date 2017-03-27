@@ -11,9 +11,9 @@ namespace Panlatent\Annotation\Tag;
 
 use Panlatent\Annotation\Tag;
 
-class AuthorTag extends Tag
+class ReturnTag extends Tag
 {
-    protected $author;
+    protected $type;
 
-    protected $email;
+    protected $description;
 }

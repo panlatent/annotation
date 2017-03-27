@@ -11,9 +11,11 @@ namespace Panlatent\Annotation\Tag;
 
 use Panlatent\Annotation\Tag;
 
-class AuthorTag extends Tag
+class DeprecatedTag extends Tag
 {
-    protected $author;
+    protected $startingVersion;
 
-    protected $email;
+    protected $endingVersion;
+
+    protected $description;
 }

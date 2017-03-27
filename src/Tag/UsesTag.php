@@ -11,7 +11,11 @@ namespace Panlatent\Annotation\Tag;
 
 use Panlatent\Annotation\Tag;
 
-class InheritDocTag extends Tag
+class UsesTag extends Tag
 {
+    protected $file;
 
+    protected $fqsen;
+
+    protected $description;
 }

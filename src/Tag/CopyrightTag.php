@@ -13,5 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class CopyrightTag extends Tag
 {
-    protected $name = 'copyright';
+    protected $description;
 }
