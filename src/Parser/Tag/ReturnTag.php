@@ -7,9 +7,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation;
+namespace Panlatent\Annotation\Parser\Tag;
 
-class Exception extends \Exception
+use Panlatent\Annotation\Parser\Tag;
+
+class ReturnTag extends Tag
 {
 
 }

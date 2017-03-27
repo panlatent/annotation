@@ -9,11 +9,7 @@
 
 namespace Panlatent\Annotation;
 
-abstract class Annotation
+class Annotation extends PhpDoc
 {
-    protected $phpDoc;
 
-    public function __construct($docComment)
-    {
-    }
 }

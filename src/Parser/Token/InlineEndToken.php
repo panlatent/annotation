@@ -7,9 +7,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation;
+namespace Panlatent\Annotation\Parser\Token;
 
-class Exception extends \Exception
+use Panlatent\Annotation\Parser\Token;
+
+class InlineEndToken extends Token
 {
 
 }

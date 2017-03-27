@@ -20,7 +20,7 @@ $phpdoc['tag_end_attach'] = <<<DOCEND
  * A bed PHPDoc
  *
  * @see \Parser\LexicalAnalyzerTest
- * What?
+ * @see%%%
  */
 DOCEND;
 

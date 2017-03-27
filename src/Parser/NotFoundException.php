@@ -7,9 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation;
+namespace Panlatent\Annotation\Parser;
 
-class Exception extends \Exception
+class NotFoundException extends Exception
 {
 
 }

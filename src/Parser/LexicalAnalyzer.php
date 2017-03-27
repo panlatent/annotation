@@ -11,10 +11,17 @@ namespace Panlatent\Annotation\Parser;
 
 use Panlatent\Annotation\Parser\Token\DescriptionToken;
 use Panlatent\Annotation\Parser\Token\FinalToken;
+use Panlatent\Annotation\Parser\Token\InlineEndToken;
+use Panlatent\Annotation\Parser\Token\InlineStartToken;
 use Panlatent\Annotation\Parser\Token\SummaryToken;
+use Panlatent\Annotation\Parser\Token\TagArgumentToken;
+use Panlatent\Annotation\Parser\Token\TagDescriptionToken;
 use Panlatent\Annotation\Parser\Token\TagDetailsToken;
 use Panlatent\Annotation\Parser\Token\TagNameToken;
+use Panlatent\Annotation\Parser\Token\TagSignatureToken;
+use Panlatent\Annotation\Parser\Token\TagSpecializationToken;
 use Panlatent\Annotation\Parser\Token\TagToken;
+use Panlatent\Boost\BStack;
 
 /**
  * Class LexicalAnalyzer
@@ -62,72 +69,7 @@ class LexicalAnalyzer
 
     public function __construct()
     {
-    }
 
-    public static function generateCharacterStream($string)
-    {
-        $length = strlen($string);
-        $lineNumber = 1;
-        $columnNumber = 1;
-        for ($i = 0; $i < $length; ++$i) {
-            $c = $string[$i];
-            if (yield $c) {
-                yield [$lineNumber, $columnNumber];
-            }
-
-            if ("\n" == $c) {
-                ++$lineNumber;
-                $columnNumber = 1;
-            } else {
-                ++$columnNumber;
-            }
-        }
-    }
-
-    public function check($docComment)
-    {
-        if ( ! preg_match('#/\*\*.*\*/#s', $docComment)) {
-            throw new Exception('Bad DocComment');
-        }
-        if (false !== strpos($docComment, "\r\n")) {
-            if ( ! preg_match('#^\s*\*#um', $docComment)) {
-                throw new Exception('Bad multi line DocComment');
-            }
-        }
-    }
-
-    /**
-     * Replace DocComment asterisk for space.
-     *
-     * @param string $docComment
-     * @param bool   $keepPosition
-     * @return string
-     */
-    public function preprocessor($docComment, $keepPosition = true)
-    {
-        if (0 === strncmp($docComment, '/**', 3)) { //
-            $docComment = substr($docComment, 3);
-            if ($keepPosition) {
-                $docComment = str_repeat(' ', 3) . $docComment;
-            } else {
-                $docComment = ltrim($docComment);
-            }
-        }
-        if ('*/' == substr($docComment, -2)) {
-            $docComment = substr($docComment, 0, -2);
-            if ($keepPosition) {
-                $docComment .= str_repeat(' ', 2);
-            } else {
-                $docComment = rtrim($docComment);
-            }
-        }
-        if ($keepPosition) {
-            $docComment = preg_replace('#^([ \t]*)\*\*?([ \t]{0,1})#um', '\1 \2', $docComment);
-        } else {
-            $docComment = preg_replace('#^[ \t]*\*\*?[ \t]{0,1}#um', '', $docComment);
-        }
-
-        return str_replace(["\r", "\r\n"], "\n", $docComment);
     }
 
     /**
@@ -137,106 +79,210 @@ class LexicalAnalyzer
      */
     public function tokenization($docComment)
     {
-        $stream = $this->generateCharacterStream($docComment);
-        $status = new Status();
+        $stream = new CharacterStream($docComment);
         $token = new Token();
-        for (; ! $token instanceof FinalToken
-                && $stream->valid(); $stream->next()) {
-            $c = $stream->current();
+        $stack = new BStack();
+        $status = new Status();
+        $extension = '';
+
+        foreach ($stream->generator() as $char) {
+            if ("\0" == $char) {
+                break;
+            }
+
             switch (get_class($token)) {
+
                 case Token::class:
-                    if (preg_match('#\s#', $c)) {
+
+                    if (preg_match('#\s#', $char)) {
                         continue;
                     }
-                    if ('@' == $c) {
+                    if ('@' == $char) {
                         $status->add(self::STATUS_TAG);
-                        $token = TagToken::factory($stream->send(true));
+                        $token = TagToken::factory($stream->getPosition());
                         continue;
                     }
-                    if ("\0" != $c && ! $status->has(self::STATUS_SUMMARY)) {
+                    if ( ! $status->has(self::STATUS_SUMMARY)) {
                         $status->add(self::STATUS_SUMMARY);
-                        $token = SummaryToken::factory($stream->send(true));
-                        $token->value .= $c;
+                        $token = SummaryToken::factory($stream->getPosition());
+                        $token->value .= $char;
                         continue;
                     }
-                    throw SyntaxException::factory('Unknown format', $stream->send(true));
+
+                    throw new SyntaxException('Unknown format', $stream);
+
                 case SummaryToken::class:
-                    if ('.' == $c || "\n" == $c) {
-                        $token->value .= $c;
-                        $stream->next();
-                        for ($nc = $stream->current();
-                             preg_match('#[ \t]#', $nc);
-                             $nc = $stream->current()) { // Skip space
-                            $stream->next();
+
+                    if ('.' == $char || "\n" == $char) {
+                        $token->value .= $char;
+                        while ($stream->expected(" \t")) {
+                            $stream->skip();
                         }
-                        if ("\n" == $nc) {
+                        if ($stream->expected("\n")) {
                             yield $token;
                             $token = new DescriptionToken();
                         }
                         continue;
                     }
-                    if ("\0" != $c) {
-                        $token->value .= $c;
-                        continue;
-                    }
-                    throw SyntaxException::factory('Unexpected summary', $stream->send(true));
-                case DescriptionToken::class:
-                    // if ("\n" == $c) @todo
-                    if ('@' == $c) {
-                        yield $token;
-                        $token = TagToken::factory($stream->send(true));
-                        continue;
-                    }
-                    if ("\0" != $c) {
-                        if (empty($token->value)) {
-                            if (preg_match('#\s#', $c)) {
-                                continue;
-                            }
-                            $token->setPosition($stream->send(true));
-                        }
-                        $token->value .= $c;
+                    if (1) {
+                        $token->value .= $char;
                         continue;
                     }
 
-                    throw SyntaxException::factory('Unexpected description', $stream->send(true));
-                case TagToken::class:
-                    if (preg_match('#[a-zA-Z\\\\]#', $c)) {
+                    throw new SyntaxException('Unexpected summary', $stream);
+
+                case DescriptionToken::class:
+
+                    if ('@' == $char) {
                         yield $token;
-                        $token = TagNameToken::factory($stream->send(true));
-                        $token->value .= $c;
+                        $token = TagToken::factory($stream->getPosition());
                         continue;
                     }
-                    throw SyntaxException::factory('Unexpected tag name', $stream->send(true));
-                case TagNameToken::class:
-                    if (preg_match('#\s#', $c)) {
-                        yield $token;
-                        $token = new TagDetailsToken(); // @todo
-                        continue;
-                    } elseif (preg_match('#[a-zA-Z0-9\_-]#', $c)) {
-                        $token->value .= $c;
-                        continue;
-                    } elseif (':' == $c) {
-                        $token = new Token(); // @todo
-                        continue;
-                    }
-                    throw SyntaxException::factory('Unexpected tag name', $stream->send(true));
-                case TagDetailsToken::class: //@todo
-                    if (preg_match('#\s#', $c) && empty($token->value)) {
-                        continue;
-                    }
-                    if ("\n" == $c) {
-                        yield $token;
-                        $token = new Token();
-                        continue;
-                    }
-                    if ("\0" != $c) {
+                    if (1) {
                         if (empty($token->value)) {
-                            $token->setPosition($stream->send(true));
+                            if (preg_match('#\s#', $char)) {
+                                continue;
+                            }
+                            $token->setPosition($stream->getPosition());
                         }
-                        $token->value .= $c;
+                        $token->value .= $char;
+                        continue;
                     }
-                    break;
+
+                    throw new SyntaxException('Unexpected description', $stream);
+
+                case TagToken::class:
+
+                    if (preg_match('#[a-zA-Z\\\\]#', $char)) {
+                        yield $token;
+                        $token = TagNameToken::factory($stream->getPosition());
+                        $token->value .= $char;
+                        continue;
+                    }
+
+                    throw new SyntaxException('Unexpected tag name', $stream);
+
+                case TagNameToken::class:
+
+                    if (preg_match('#\s#', $char)) {
+                        yield $token;
+                        $token = new TagDetailsToken();
+                        continue;
+                    } elseif (preg_match('#[a-zA-Z0-9\_-]#', $char)) {
+                        $token->value .= $char;
+                        continue;
+                    } elseif (':' == $char) {
+                        yield $token;
+                        $token = new TagSpecializationToken();
+                        continue;
+                    }
+
+                    throw new SyntaxException('Unexpected tag name', $stream);
+
+                case TagSpecializationToken::class:
+
+                    if (preg_match('#[0-9a-zA-Z-]#', $char)) {
+                        $token->value .= $char;
+                    } elseif (preg_match('#\s#', $char)) {
+                        yield $token;
+                        $token = new TagDetailsToken();
+                        continue;
+                    }
+
+                    throw new SyntaxException('Unexpected tag specialization', $stream);
+
+                case TagDetailsToken::class:
+
+                    if (preg_match('#\s#', $char) && empty($token->value)) {
+                        continue;
+                    }
+
+                    if (empty($token->value)) {
+                        $token->setPosition($stream->getPosition());
+                    }
+
+                    if ($receive = yield $token) {
+                        if ($receive instanceof LexicalScanInterface) {
+                            $extension = $receive->lexicalScan($token, $stream, $stack, $status);
+                        } else {
+                            // @todo
+                        }
+
+
+                        continue;
+                    } else {
+                        if ('{' == $char) {
+                            $token = InlineStartToken::factory($stream->getPosition()); // A Inline PHPDoc
+                            yield $token;
+                            $token = new Token();
+                            continue;
+                        } elseif ('(' == $char) {
+                            $token = TagSignatureToken::factory($stream->getPosition());
+                            continue;
+                        } else {
+                            $token = TagDescriptionToken::factory($stream->getPosition());
+                            $token->value .= $char;
+                            continue;
+                        }
+
+                        continue;
+                    }
+                    // throw new SyntaxException('Unexpected tag details', $stream);
+
+                case TagDescriptionToken::class:
+
+                    if ("\n" == $char) {
+                        $token->value .= $char;
+                        while ($stream->expected(" \t")) {
+                            $stream->skip();
+                        }
+                        if ($stream->expected('@')) {
+                            $stream->skip();
+                            yield $token;
+                            $token = TagToken::factory($stream->getPosition());
+                            continue;
+                        }
+
+                        continue;
+                    }
+
+                    $token->value .= $char;
+
+                    continue;
+
+                // throw new SyntaxException('Unexpected tag description', $stream);
+
+                case TagSignatureToken::class:
+
+                    throw new SyntaxException('Unexpected tag signature', $stream);
+
+                //case TagInline
+
+                case TagArgumentToken::class:
+
+                    throw new SyntaxException('Unexpected tag argument', $stream);
+
+                default:
+
+                    if (is_object($extension) &&
+                        $extension instanceof \Generator &&
+                        ! $extension->valid()) {
+
+                        $token = $extension->current();
+                        $extension->next();
+                    }
+
+                    throw new SyntaxException('Unexpected token class "' . get_class($token) . '"', $stream);
+
+            } // The Switch End.
+
+        } // The Foreach End.
+
+        if ( ! $token instanceof FinalToken) {
+            if (get_class($token) != Token::class) {
+                yield $token;
             }
+            yield FinalToken::factory($stream->getPosition());
         }
     }
 
@@ -244,6 +290,4 @@ class LexicalAnalyzer
     {
 
     }
-
-
 }

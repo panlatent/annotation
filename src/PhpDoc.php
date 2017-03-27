@@ -9,7 +9,7 @@
 
 namespace Panlatent\Annotation;
 
-class PhpDoc
+abstract class PhpDoc
 {
     /**
      * @var string

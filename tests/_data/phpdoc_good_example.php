@@ -29,7 +29,7 @@ $phpdoc['summary_without_dot'] = <<<DOCEND
 DOCEND;
 
 
-$phpdoc['full'] = <<<DOCEND
+$phpdoc['with_tags'] = <<<DOCEND
 /**
  * Annotation - Parsing PHPDoc style annotations from comments
  *
