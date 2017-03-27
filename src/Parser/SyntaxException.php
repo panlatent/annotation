@@ -32,7 +32,8 @@ class SyntaxException extends Exception
         $this->syntaxColumn = $position->getColumnNumber();
         $this->syntaxContext = $position->getContext();
 
-        $context = $this->syntaxContext['current'];
+        $context = substr($this->syntaxContext['current'], 0, $this->syntaxColumn - 1) . '^' .
+            substr($this->syntaxContext['current'], $this->syntaxColumn - 1);
         $message = "$message at Line {$this->syntaxLine}, Column:{$this->syntaxColumn}. The syntax error in context: \"{$context}\"";
         parent::__construct($message, $code, $previous);
     }
