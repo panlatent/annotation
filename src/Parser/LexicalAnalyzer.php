@@ -9,7 +9,6 @@
 
 namespace Panlatent\Annotation\Parser;
 
-use Panlatent\Annotation\InlineTag;
 use Panlatent\Annotation\Parser\Token\DescriptionToken;
 use Panlatent\Annotation\Parser\Token\FinalToken;
 use Panlatent\Annotation\Parser\Token\InlineEndToken;
@@ -84,6 +83,7 @@ class LexicalAnalyzer
         $token = new Token();
         $stack = new BStack();
         $status = new Status();
+        $extension = '';
 
         foreach ($stream->generator() as $char) {
             if ("\0" == $char) {
@@ -179,11 +179,19 @@ class LexicalAnalyzer
 
                     throw new SyntaxException('Unexpected tag name', $stream);
 
-                case TagSpecializationToken::class: // @todo
+                case TagSpecializationToken::class:
+
+                    if (preg_match('#[0-9a-zA-Z-]#', $char)) {
+                        $token->value .= $char;
+                    } elseif (preg_match('#\s#', $char)) {
+                        yield $token;
+                        $token = new TagDetailsToken();
+                        continue;
+                    }
 
                     throw new SyntaxException('Unexpected tag specialization', $stream);
 
-                case TagDetailsToken::class: // @todo
+                case TagDetailsToken::class:
 
                     if (preg_match('#\s#', $char) && empty($token->value)) {
                         continue;
@@ -193,19 +201,32 @@ class LexicalAnalyzer
                         $token->setPosition($stream->getPosition());
                     }
 
-                    yield $token;
+                    if ($receive = yield $token) {
+                        if ($receive instanceof LexicalScanInterface) {
+                            $extension = $receive->lexicalScan($token, $stream, $stack, $status);
+                        } else {
+                            // @todo
+                        }
 
-                    if ('{' == $char) {
-                        $token = InlineStartToken::factory($stream->getPosition());
-                        // $stack->push('{'); // (!) PUSH
-                    } elseif ('(' == $char) {
-                        $token = TagSignatureToken::factory($stream->getPosition());
+
+                        continue;
                     } else {
-                        $token = TagDescriptionToken::factory($stream->getPosition());
-                        $token->value .= $char;
-                    }
+                        if ('{' == $char) {
+                            $token = InlineStartToken::factory($stream->getPosition()); // A Inline PHPDoc
+                            yield $token;
+                            $token = new Token();
+                            continue;
+                        } elseif ('(' == $char) {
+                            $token = TagSignatureToken::factory($stream->getPosition());
+                            continue;
+                        } else {
+                            $token = TagDescriptionToken::factory($stream->getPosition());
+                            $token->value .= $char;
+                            continue;
+                        }
 
-                    continue;
+                        continue;
+                    }
                     // throw new SyntaxException('Unexpected tag details', $stream);
 
                 case TagDescriptionToken::class:
@@ -229,7 +250,7 @@ class LexicalAnalyzer
 
                     continue;
 
-                    // throw new SyntaxException('Unexpected tag description', $stream);
+                // throw new SyntaxException('Unexpected tag description', $stream);
 
                 case TagSignatureToken::class:
 
@@ -240,6 +261,19 @@ class LexicalAnalyzer
                 case TagArgumentToken::class:
 
                     throw new SyntaxException('Unexpected tag argument', $stream);
+
+                default:
+
+                    if (is_object($extension) &&
+                        $extension instanceof \Generator &&
+                        ! $extension->valid()) {
+
+                        $token = $extension->current();
+                        $extension->next();
+                    }
+
+                    throw new SyntaxException('Unexpected token class "' . get_class($token) . '"', $stream);
+
             } // The Switch End.
 
         } // The Foreach End.
