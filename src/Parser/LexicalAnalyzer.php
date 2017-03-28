@@ -11,7 +11,7 @@ namespace Panlatent\Annotation\Parser;
 
 use Panlatent\Annotation\Parser\Token\DescriptionToken;
 use Panlatent\Annotation\Parser\Token\FinalToken;
-use Panlatent\Annotation\Parser\Token\InlineEndToken;
+//use Panlatent\Annotation\Parser\Token\InlineEndToken;
 use Panlatent\Annotation\Parser\Token\InlineStartToken;
 use Panlatent\Annotation\Parser\Token\SummaryToken;
 use Panlatent\Annotation\Parser\Token\TagArgumentToken;
@@ -83,7 +83,7 @@ class LexicalAnalyzer
         $token = new Token();
         $stack = new BStack();
         $status = new Status();
-        $extension = '';
+        $scanner = false;
 
         foreach ($stream->generator() as $char) {
             if ("\0" == $char) {
@@ -201,9 +201,9 @@ class LexicalAnalyzer
                         $token->setPosition($stream->getPosition());
                     }
 
-                    if ($receive = yield $token) {
-                        if ($receive instanceof LexicalScanInterface) {
-                            $extension = $receive->lexicalScan($token, $stream, $stack, $status);
+                    if ($receive = (yield $token)) {
+                        if (is_callable($receive)) {
+                            $scanner = call_user_func($receive, $token, $stream, $stack, $status);
                         } else {
                             // @todo
                         }
@@ -264,12 +264,12 @@ class LexicalAnalyzer
 
                 default:
 
-                    if (is_object($extension) &&
-                        $extension instanceof \Generator &&
-                        ! $extension->valid()) {
+                    if (is_object($scanner) &&
+                        $scanner instanceof \Generator &&
+                        ! $scanner->valid()) {
 
-                        $token = $extension->current();
-                        $extension->next();
+                        $token = $scanner->current();
+                        $scanner->next();
                     }
 
                     throw new SyntaxException('Unexpected token class "' . get_class($token) . '"', $stream);

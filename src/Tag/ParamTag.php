@@ -11,7 +11,7 @@ namespace Panlatent\Annotation\Tag;
 
 use Panlatent\Annotation\Tag;
 
-class VersionTag extends Tag
+class ParamTag extends Tag
 {
 
 }

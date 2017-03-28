@@ -9,17 +9,12 @@
 
 namespace Panlatent\Annotation;
 
-use Panlatent\Annotation\Tag\AuthorTag;
-use Panlatent\Annotation\Tag\CopyrightTag;
-use Panlatent\Annotation\Tag\VersionTag;
-use Panlatent\Boost\ObjectStorage;
+//use Panlatent\Annotation\Tag\AuthorTag;
+//use Panlatent\Annotation\Tag\CopyrightTag;
+//use Panlatent\Annotation\Tag\VersionTag;
+use Panlatent\Boost\Storage;
 
-class TagStorage extends ObjectStorage
+class TagStorage extends Storage
 {
-    public function __construct()
-    {
-        $this->attach(new VersionTag());
-        $this->attach(new AuthorTag());
-        $this->attach(new CopyrightTag());
-    }
+
 }

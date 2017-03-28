@@ -7,11 +7,10 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Tag;
+namespace Panlatent\Annotation;
 
-use Panlatent\Annotation\Tag;
 
-class VersionTag extends Tag
+class AnnotationMethod
 {
 
 }

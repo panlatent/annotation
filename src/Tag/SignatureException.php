@@ -9,9 +9,9 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\Tag;
+use Panlatent\Annotation\Exception;
 
-class VersionTag extends Tag
+class SignatureException extends Exception
 {
 
 }

@@ -9,8 +9,6 @@
 
 namespace Panlatent\Annotation;
 
-use Panlatent\Annotation\Parser\Tag;
-
 class PhpDocFactory
 {
     /**
@@ -44,15 +42,15 @@ class PhpDocFactory
     public function create()
     {
         if ( ! $this->product) {
-            $this->product = Annotation::class;
+            $this->product = PhpDoc::class;
         }
 
-        return new ($this->product)($this->summary, $this->description, $this->tags);
+        return new $this->product($this->summary, $this->description, $this->tags);
     }
 
-    public function addTag(Tag $tag)
+    public function addTag(TagInterface $tag)
     {
-        $this->tags->attach($tag);
+        $this->tags->set($tag->getName(), $tag);
     }
 
     public function setSummary($summary)

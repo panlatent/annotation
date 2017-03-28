@@ -7,11 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Tag;
+namespace Panlatent\Annotation\Parser;
 
-use Panlatent\Annotation\Tag;
-
-class VersionTag extends Tag
+interface PatternMatchFactoryInterface extends AbstractFactoryInterface
 {
-
+    public static function create($content);
 }

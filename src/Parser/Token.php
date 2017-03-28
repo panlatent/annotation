@@ -26,12 +26,22 @@ class Token
      */
     protected $column;
 
+    /**
+     * Token constructor.
+     *
+     * @param int $line
+     * @param int $column
+     */
     public function __construct($line = null, $column = null)
     {
         $this->line = $line;
         $this->column = $column;
     }
 
+    /**
+     * @param array $position
+     * @return static
+     */
     public static function factory(array $position)
     {
         return new static($position[0], $position[1]);
@@ -53,7 +63,10 @@ class Token
         return $this->column;
     }
 
-    public function setPosition($position)
+    /**
+     * @param array $position
+     */
+    public function setPosition(array $position)
     {
         $this->line = $position[0];
         $this->column = $position[1];
