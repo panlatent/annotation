@@ -74,7 +74,7 @@ class CharacterStream implements SyntaxPositionInterface
 
     /**
      * @param string $char
-     * @param bool  $regular
+     * @param bool   $regular
      * @return bool
      */
     public function expected($char, $regular = false)
@@ -82,7 +82,7 @@ class CharacterStream implements SyntaxPositionInterface
         if ($this->index + 1 > $this->length) {
             return false;
         } elseif ($regular) {
-            return (bool)preg_match($regular, $char);
+            return (bool)preg_match($char, substr($this->content, $this->index + 1));
         } elseif (strlen($char) == 1) {
             return isset($this->content[$this->index + 1]) && $char === $this->content[$this->index + 1];
         }
@@ -95,14 +95,35 @@ class CharacterStream implements SyntaxPositionInterface
         return false;
     }
 
-    public function trace()
+    /**
+     * @param string $char
+     * @param bool   $regular
+     * @return bool
+     */
+    public function trace($char, $regular = false)
     {
+        if ($this->index <= 0) {
+            return false;
+        } elseif ($regular) {
+            return (bool)preg_match($char, substr($this->content, 0, $this->index + 1));
+        } elseif (strlen($char) == 1){
+            return $char === $this->content[$this->index - 1];
+        }
+        for ($i = 0; $i < strlen($char); ++$i) {
+            if ($char[$i] === $this->content[$this->index - 1]){
+                return true;
+            }
+        }
 
+        return false;
     }
 
-    public function back()
+    public function back($number = 1)
     {
-
+        $this->index -= $number;
+        if ($this->index < 0) {
+            $this->index = 0;
+        }
     }
 
     public function skip($number = 1)

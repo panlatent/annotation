@@ -59,7 +59,24 @@ class CharacterStreamTest extends TestCase
                 }
             }
         }
-
     }
 
+    public function testExpected()
+    {
+        $stream = new CharacterStream('ABCDEFG');
+        $stream->skip(3);
+        $this->assertTrue($stream->expected('E'));
+        $this->assertFalse($stream->expected('F'));
+        $this->assertTrue($stream->expected('Efghijk'));
+    }
+
+    public function testTrace()
+    {
+        $stream = new CharacterStream('ABCDEFG');
+        $this->assertFalse($stream->trace('A'));
+        $stream->skip(3);
+        $this->assertTrue($stream->trace('C'));
+        $this->assertFalse($stream->trace('B'));
+        $this->assertTrue($stream->trace('CBA'));
+    }
 }
