@@ -7,11 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Tag;
+namespace Panlatent\Annotation\Parser;
 
-use Panlatent\Annotation\Tag;
-
-class SpecializationTag extends Tag // 专业化标签 @see:unit-test \Mapping\EntityTest::testGetId
+interface FactoryInterface extends AbstractFactoryInterface
 {
-    protected $specialization;
+    public static function create();
 }

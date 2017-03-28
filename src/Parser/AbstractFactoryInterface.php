@@ -7,9 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Tag;
+namespace Panlatent\Annotation\Parser;
 
-class InlineInheritDocTag extends InheritDocTag
+interface AbstractFactoryInterface
 {
 
 }

@@ -9,11 +9,34 @@
 
 namespace Panlatent\Annotation;
 
-abstract class Annotation
+class Annotation
 {
-    protected $phpDoc;
+    /**
+     * @var \Panlatent\Annotation\Parser
+     */
+    protected $parser;
 
-    public function __construct($docComment)
+    public function __construct(Parser $parser = null)
     {
+        if ( ! $parser) {
+            $parser = new Parser();
+        }
+        $this->parser = $parser;
+    }
+
+    /**
+     * @return \Panlatent\Annotation\Parser
+     */
+    public function getParser()
+    {
+        return $this->parser;
+    }
+
+    /**
+     * @param \Panlatent\Annotation\Parser $parser
+     */
+    public function setParser($parser)
+    {
+        $this->parser = $parser;
     }
 }

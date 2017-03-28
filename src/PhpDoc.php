@@ -38,9 +38,10 @@ class PhpDoc
         $this->summary = $summary;
         $this->description = $description;
         if ( ! $tags) {
-           $tags = new TagStorage();
+            $this->tags = new TagStorage();
+        } else {
+            $this->tags = $tags;
         }
-        $this->tags = $tags;
     }
 
     /**
@@ -59,11 +60,21 @@ class PhpDoc
         return $this->description;
     }
 
+    public function getTag($name)
+    {
+        return $this->tags->get($name);
+    }
+
     /**
      * @return \Panlatent\Annotation\TagStorage
      */
     public function getTags()
     {
         return $this->tags;
+    }
+
+    public function hasTag($name)
+    {
+        $this->tags->has($name);
     }
 }

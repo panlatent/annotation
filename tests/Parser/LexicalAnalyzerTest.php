@@ -7,72 +7,42 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Parser;
+namespace Tests\Parser;
 
 use Panlatent\Annotation\Parser\LexicalAnalyzer;
+use Panlatent\Annotation\Parser\Preprocessor;
 use Panlatent\Annotation\Parser\SyntaxException;
 use Panlatent\Annotation\Parser\Token;
+use PHPUnit\Framework\TestCase;
 
-class LexicalAnalyzerTest extends \PHPUnit_Framework_TestCase
+class LexicalAnalyzerTest extends TestCase
 {
-    protected $good;
-
-    protected $bad;
-
-    protected function setUp()
-    {
-        $this->good = require(__DIR__ . '/../_data/phpdoc_good_example.php');
-        $this->bad = require(__DIR__ . '/../_data/phpdoc_bad_example.php');
-    }
-
-    public function testPreprocessor()
-    {
-        $lexer = new LexicalAnalyzer();
-        $this->assertEquals("    Annotation - Parsing PHPDoc style annotations from comments.   ",
-            $lexer->preprocessor($this->good['single_line']));
-        $this->assertEquals("   \n   Annotation - Parsing PHPDoc style annotations from comments.\n   Summary with dot, this is description\n  \n   @var int\n   ",
-            $lexer->preprocessor($this->good['summary_dot']));
-        $this->assertEquals("   \n   Annotation - Parsing PHPDoc style annotations from comments\n  \n   Summary without dot, this is description\n   ",
-            $lexer->preprocessor($this->good['summary_without_dot']));
-    }
-
-    public function testPreprocessorWithoutPosition()
-    {
-        $lexer = new LexicalAnalyzer();
-        $this->assertEquals("Annotation - Parsing PHPDoc style annotations from comments.",
-            $lexer->preprocessor($this->good['single_line'], false));
-        $this->assertEquals("Annotation - Parsing PHPDoc style annotations from comments.\nSummary with dot, this is description\n\n@var int",
-            $lexer->preprocessor($this->good['summary_dot'], false));
-        $this->assertEquals("Annotation - Parsing PHPDoc style annotations from comments\n\nSummary without dot, this is description",
-            $lexer->preprocessor($this->good['summary_without_dot'], false));
-    }
-
     public function testTokenization()
     {
+        $good = require(__DIR__ . '/../_data/phpdoc_good_expected.php');
+        $expected = require(__DIR__ . '/../_data/lexer_expected.php');
+
         $lexer = new LexicalAnalyzer();
-        $content = $lexer->preprocessor($this->good['summary_dot']);
-        foreach ($lexer->tokenization($content) as $token) {
-            $this->assertInstanceOf(Token::class, $token);
+        foreach ($good as $key => $value) {
+            $list = array_reverse($expected[$key]);
+            foreach ($lexer->tokenization($value) as $token) {
+                $this->assertEquals(array_pop($list), get_class($token), "Content in $key");
+            }
+            $this->assertEmpty($list, 'Expected tokens remaining or actual tokens missing');
         }
     }
 
     public function testTokenizationTryException()
     {
-        $this->setExpectedException(SyntaxException::class);
+        $this->expectException(SyntaxException::class);
+        $bad = require(__DIR__ . '/../_data/phpdoc_bad_example.php');
 
+        $content = (new Preprocessor())->preprocessor($bad['tag_end_attach']);
         $lexer = new LexicalAnalyzer();
-        $content = $lexer->preprocessor($this->bad['tag_end_attach']);
-        foreach ($lexer->tokenization($content) as $token) {
-            $this->assertInstanceOf(Token::class, $token);
+        foreach ($bad as $key => $value) {
+            foreach ($lexer->tokenization($content) as $token) {
+                $this->assertInstanceOf(Token::class, $token);
+            }
         }
-    }
-
-    public function testGenerateCharacterStream()
-    {
-        $actual = '';
-        foreach (LexicalAnalyzer::generateCharacterStream('HelloWorld') as $char) {
-            $actual .= $char;
-        }
-        $this->assertEquals('HelloWorld', $actual);
     }
 }

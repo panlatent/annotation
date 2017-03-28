@@ -7,11 +7,12 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Parser;
+namespace Tests\Parser;
 
 use Panlatent\Annotation\Parser\ABnf;
+use PHPUnit\Framework\TestCase;
 
-class ABnfTest extends \PHPUnit_Framework_TestCase
+class ABnfTest extends TestCase
 {
     public function testIsAlpha()
     {

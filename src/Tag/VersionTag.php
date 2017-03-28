@@ -13,5 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class VersionTag extends Tag
 {
-    protected $name = 'version';
+
 }
