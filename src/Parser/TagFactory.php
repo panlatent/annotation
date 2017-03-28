@@ -57,9 +57,12 @@ class TagFactory
         } elseif ($this->isFactory(PatternMatchFactoryInterface::class)) {
             /** @var \Panlatent\Annotation\Parser\PatternMatchFactoryInterface $product */
             return $this->instance = $product::create($this->description);
+        } elseif ($this->isFactory(Tag::class)) {
+            /** @var \Panlatent\Annotation\Tag $product */
+            return $this->instance = $product::create($this->name, $this->description);
         }
-        /** @var \Panlatent\Annotation\Tag $product */
-        return $this->instance = $product::create($this->name, $this->description);
+
+        return $this->instance = new $product();
     }
 
     public function getLexicalScanner()
@@ -97,7 +100,7 @@ class TagFactory
             $factory = AbstractFactoryInterface::class;
         }
 
-        return in_array($factory, class_parents($this->product));
+        return is_subclass_of($this->product, $factory);
     }
 
     /**
@@ -108,6 +111,10 @@ class TagFactory
         return $this->product;
     }
 
+    /**
+     * @param string $className
+     * @return $this
+     */
     public function setProduct($className)
     {
         $this->product = $className;
@@ -116,6 +123,8 @@ class TagFactory
             /** @var \Panlatent\Annotation\Parser\LexicalScanFactoryInterface $className */
             $this->lexicalScanner = [$className, 'create'];
         }
+
+        return $this;
     }
 
     /**
@@ -128,10 +137,13 @@ class TagFactory
 
     /**
      * @param string $name
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -144,10 +156,13 @@ class TagFactory
 
     /**
      * @param string $specialization
+     * @return $this
      */
     public function setSpecialization($specialization)
     {
         $this->specialization = $specialization;
+
+        return $this;
     }
 
     /**
@@ -160,9 +175,12 @@ class TagFactory
 
     /**
      * @param string $description
+     * @return $this
      */
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
     }
 }
