@@ -9,9 +9,9 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\Tag;
+use Panlatent\Annotation\TagAbstract;
 
-class CategoryTag extends Tag
+final class CategoryTag extends TagAbstract
 {
-
+    protected $name = 'category';
 }

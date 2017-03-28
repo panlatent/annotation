@@ -9,9 +9,9 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\Tag;
+use Panlatent\Annotation\TagAbstract;
 
-class VarTag extends Tag
+final class VarTag extends TagAbstract
 {
-
+    protected $name = 'api';
 }

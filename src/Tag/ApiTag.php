@@ -9,9 +9,9 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\Tag;
+use Panlatent\Annotation\TagAbstract;
 
-class ApiTag extends Tag
+final class ApiTag extends TagAbstract
 {
 
 }
