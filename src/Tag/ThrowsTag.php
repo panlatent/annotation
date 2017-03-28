@@ -13,7 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class ThrowsTag extends Tag
 {
-    protected $type;
 
-    protected $description;
 }

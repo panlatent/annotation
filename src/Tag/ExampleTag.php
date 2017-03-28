@@ -13,7 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class ExampleTag extends Tag
 {
-    protected $uri;
 
-    protected $description;
 }

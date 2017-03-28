@@ -13,9 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class SeeTag extends Tag
 {
-    protected $uri;
 
-    protected $fqsen;
-
-    protected $description;
 }

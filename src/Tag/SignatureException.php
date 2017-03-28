@@ -7,11 +7,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser\Tag;
+namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\Parser\Tag;
+use Panlatent\Annotation\Exception;
 
-class ExampleTag extends Tag
+class SignatureException extends Exception
 {
 
 }

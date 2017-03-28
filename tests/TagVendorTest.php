@@ -7,10 +7,18 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Tests\Parser;
+/**
+ * Annotation - Parsing PHPDoc style annotations from comments
+ *
+ * @author  panlatent@gmail.com
+ * @link    https://github.com/panlatent/annotation
+ * @license https://opensource.org/licenses/MIT
+ */
 
-use Panlatent\Annotation\Parser\NotFoundException;
-use Panlatent\Annotation\Parser\TagVendor;
+namespace Tests;
+
+use Panlatent\Annotation\NotFoundException;
+use Panlatent\Annotation\TagVendor;
 
 class TagVendorTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,6 +39,14 @@ class TagVendorTest extends \PHPUnit_Framework_TestCase
         $vendor->get('abc');
     }
 
+    public function testGetThrowExceptionOfDeprecatedTag()
+    {
+        $this->expectException(NotFoundException::class);;
+
+        $vendor = new TagVendor();
+        $vendor->get('link');
+    }
+
     public function testHas()
     {
         $vendor = new TagVendor();
@@ -42,7 +58,7 @@ class TagVendorTest extends \PHPUnit_Framework_TestCase
 
     public function testRegister()
     {
-        $vendor = new TagVendor();
+        $vendor = new TagVendor(false);
         $vendor->register('Panlatent\\Annotation\\AbcTag', 'abc');
         $this->assertAttributeEquals([
             'abc' => [

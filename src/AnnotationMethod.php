@@ -7,11 +7,10 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser\Tag;
+namespace Panlatent\Annotation;
 
-use Panlatent\Annotation\Parser\Tag;
 
-class ApiTag extends Tag
+class AnnotationMethod
 {
 
 }

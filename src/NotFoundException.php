@@ -7,9 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser;
+namespace Panlatent\Annotation;
 
-interface LexicalScanInterface
+class NotFoundException extends Exception
 {
-    public function lexicalScan($token, $stream, $stack, $status);
+
 }

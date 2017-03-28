@@ -13,9 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class PropertyTag extends Tag
 {
-    protected $type;
 
-    protected $propertyName;
-
-    protected $description;
 }

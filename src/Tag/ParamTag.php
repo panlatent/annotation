@@ -13,9 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class ParamTag extends Tag
 {
-    protected $type;
 
-    protected $paramName;
-
-    protected $description;
 }

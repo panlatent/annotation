@@ -13,5 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class PackageTag extends Tag
 {
-    protected $levels;
+
 }

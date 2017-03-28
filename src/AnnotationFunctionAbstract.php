@@ -7,11 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser;
+namespace Panlatent\Annotation;
 
-interface TagSpecializationInterface
+abstract class AnnotationFunctionAbstract
 {
-    const CLASS_NAME_SUFFIX = 'Specialization';
 
-    public function specialization();
 }

@@ -13,9 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class UsesTag extends Tag
 {
-    protected $file;
 
-    protected $fqsen;
-
-    protected $description;
 }

@@ -7,11 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Tests\_support;
+namespace Panlatent\Annotation\Parser;
 
-use Panlatent\Annotation\Tag;
-
-class OtherTag extends Tag
+interface FactoryInterface extends AbstractFactoryInterface
 {
-
+    public static function create();
 }

@@ -13,9 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class LicenseTag extends Tag
 {
-    protected $identifier;
 
-    protected $uri;
-
-    protected $licenseName;
 }

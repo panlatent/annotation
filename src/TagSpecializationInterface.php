@@ -17,22 +17,9 @@
 
 namespace Panlatent\Annotation;
 
-interface TagInterface
+interface TagSpecializationInterface
 {
-    const SIGN = '@';
+    const CLASS_NAME_SUFFIX = 'Specialization';
 
-    /**
-     * @return bool
-     */
-    //public function isWithSignature();
-
-    /**
-     * @return string
-     */
-    public function getName();
-
-    /**
-     * @return string
-     */
-    //public function getDescription();
+    public function getSpecialization();
 }

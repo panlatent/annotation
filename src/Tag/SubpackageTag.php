@@ -7,11 +7,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser\Tag;
+namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\Parser\Tag;
+use Panlatent\Annotation\Tag;
 
-class MethodTag extends Tag
+class SubpackageTag extends Tag
 {
 
 }

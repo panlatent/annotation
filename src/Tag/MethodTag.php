@@ -13,11 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class MethodTag extends Tag
 {
-    protected $returnType;
 
-    protected $methodName;
-
-    protected $parameters;
-
-    protected $description;
 }

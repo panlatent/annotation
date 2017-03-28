@@ -13,5 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class TodoTag extends Tag
 {
-    protected $description;
+
 }

@@ -13,7 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class SinceTag extends Tag
 {
-    protected $version;
 
-    protected $description;
 }

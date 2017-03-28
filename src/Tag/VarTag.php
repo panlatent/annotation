@@ -13,9 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class VarTag extends Tag
 {
-    protected $type;
 
-    protected $elementName;
-
-    protected $description;
 }

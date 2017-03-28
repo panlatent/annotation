@@ -13,9 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class GlobalTag extends Tag
 {
-    protected $type;
 
-    protected $globalName;
-
-    protected $description;
 }

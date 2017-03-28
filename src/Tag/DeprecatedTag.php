@@ -13,9 +13,5 @@ use Panlatent\Annotation\Tag;
 
 class DeprecatedTag extends Tag
 {
-    protected $startingVersion;
 
-    protected $endingVersion;
-
-    protected $description;
 }

@@ -11,7 +11,7 @@ namespace Panlatent\Annotation\Tag;
 
 use Panlatent\Annotation\Tag;
 
-class OneTag extends Tag
+class LineTag extends Tag
 {
 
 }
