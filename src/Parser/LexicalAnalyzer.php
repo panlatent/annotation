@@ -263,7 +263,6 @@ class LexicalAnalyzer
                     throw new SyntaxException('Unexpected tag argument', $stream);
 
                 default:
-
                     if (is_object($scanner) &&
                         $scanner instanceof \Generator &&
                         ! $scanner->valid()) {
