@@ -84,6 +84,7 @@ class LexicalAnalyzer
         $stack = new BStack();
         $status = new Status();
         $scanner = false;
+//        $dispatcher = new Dispatcher($stream->generator());
 
         foreach ($stream->generator() as $char) {
             if ("\0" == $char) {
@@ -94,7 +95,7 @@ class LexicalAnalyzer
 
                 case Token::class:
 
-                    if (preg_match('#\s#', $char)) {
+                    if (ABnfAssess::isLWsp($char)) {
                         continue;
                     }
                     if ('@' == $char) {
@@ -140,7 +141,7 @@ class LexicalAnalyzer
                     }
                     if (1) {
                         if (empty($token->value)) {
-                            if (preg_match('#\s#', $char)) {
+                            if (ABnfAssess::isLWsp($char)) {
                                 continue;
                             }
                             $token->setPosition($stream->getPosition());
@@ -153,7 +154,7 @@ class LexicalAnalyzer
 
                 case TagToken::class:
 
-                    if (preg_match('#[a-zA-Z\\\\]#', $char)) {
+                    if (ABnfAssess::isAlpha($char) || '\\' == $char) {
                         yield $token;
                         $token = TagNameToken::factory($stream->getPosition());
                         $token->value .= $char;
@@ -164,11 +165,14 @@ class LexicalAnalyzer
 
                 case TagNameToken::class:
 
-                    if (preg_match('#\s#', $char)) {
+                    if (ABnfAssess::isLWsp($char)) {
                         yield $token;
                         $token = new TagDetailsToken();
                         continue;
-                    } elseif (preg_match('#[a-zA-Z0-9\_-]#', $char)) {
+                    } elseif (ABnfAssess::isAlpha($char) ||
+                        ABnfAssess::isDigit($char) ||
+                        '-' == $char ||
+                        '_' == $char) {
                         $token->value .= $char;
                         continue;
                     } elseif (':' == $char) {
@@ -181,9 +185,11 @@ class LexicalAnalyzer
 
                 case TagSpecializationToken::class:
 
-                    if (preg_match('#[0-9a-zA-Z-]#', $char)) {
+                    if (ABnfAssess::isAlpha($char) ||
+                        ABnfAssess::isDigit($char) ||
+                        '-' == $char) {
                         $token->value .= $char;
-                    } elseif (preg_match('#\s#', $char)) {
+                    } elseif (ABnfAssess::isLWsp($char)) {
                         yield $token;
                         $token = new TagDetailsToken();
                         continue;
@@ -193,7 +199,7 @@ class LexicalAnalyzer
 
                 case TagDetailsToken::class:
 
-                    if (preg_match('#\s#', $char) && empty($token->value)) {
+                    if (ABnfAssess::isLWsp($char) && empty($token->value)) {
                         continue;
                     }
 
@@ -231,7 +237,7 @@ class LexicalAnalyzer
 
                 case TagDescriptionToken::class:
 
-                    if ("\n" == $char) {
+                    if ($stack->isEmpty() && "\n" == $char) {
                         $token->value .= $char;
                         while ($stream->expected(" \t")) {
                             $stream->skip();
@@ -244,6 +250,10 @@ class LexicalAnalyzer
                         }
 
                         continue;
+                    } elseif ('{' == $char && ! $stream->trace('\\')) {
+                        $stack->push('{');
+                    } elseif ('}' == $char && ! $stream->trace('\\')) {
+                        $stack->pop();
                     }
 
                     $token->value .= $char;

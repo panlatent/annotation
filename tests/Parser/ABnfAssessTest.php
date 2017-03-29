@@ -9,18 +9,18 @@
 
 namespace Tests\Parser;
 
-use Panlatent\Annotation\Parser\ABnf;
+use Panlatent\Annotation\Parser\ABnfAssess;
 use PHPUnit\Framework\TestCase;
 
-class ABnfTest extends TestCase
+class ABnfAssessTest extends TestCase
 {
     public function testIsAlpha()
     {
         foreach (str_split('AZaz') as $char) {
-            $this->assertTrue(ABnf::isAlpha($char));
+            $this->assertTrue(ABnfAssess::isAlpha($char));
         }
         foreach (str_split('09_-') as $char) {
-            $this->assertFalse(Abnf::isAlpha($char));
+            $this->assertFalse(ABnfAssess::isAlpha($char));
         }
     }
 }

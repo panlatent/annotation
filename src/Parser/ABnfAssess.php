@@ -9,8 +9,15 @@
 
 namespace Panlatent\Annotation\Parser;
 
-final class ABnf
+final class ABnfAssess
 {
+    const DQUOTE = "\x22";
+    const SP = "\x20";
+    const HTAB = "\x09";
+    const CR = "\x0D";
+    const LF = "\x0A";
+    const CRLF = "\x0D\x0A";
+
     public static function isAlpha($char)
     {
         return ("\x41" <= $char && "\x5A" >= $char) || ("\x61" <= $char && "\x7A" >= $char);
@@ -35,39 +42,31 @@ final class ABnf
 
     public static function isDQuote($char)
     {
-        return "\x22" == $char;
+        return self::DQUOTE == $char;
     }
 
     public static function isSp($char)
     {
-        return "\x20" == $char;
+        return self::SP == $char;
     }
 
     public static function isHTab($char)
     {
-        return "\x09" == $char;
+        return self::HTAB == $char;
     }
 
     public static function isWsp($char)
     {
-        return "\x20" == $char || "\x09" == $char;
+        return self::SP == $char || self::HTAB == $char;
     }
 
-    public static function isLWsp($string)
+    public static function isLWsp($char)
     {
-        for ($i = 0; strlen($string); ++$i) {
-            if (("\x20" == $string[$i] || "\x09" == $string[$i])) {
-                continue;
-            } elseif ("\r\n" == $string[$i] &&
-                isset($string[$i + 1]) &&
-                ("\x20" == $string[$i] || "\x09" == $string[$i])) {
-                continue;
-            } else {
-                return false;
-            }
-        }
-
-        return true;
+        return
+            self::SP == $char ||
+            self::HTAB == $char ||
+            self::CR == $char ||
+            self::LF == $char;
     }
 
     public static function isVChar($char)
@@ -92,12 +91,12 @@ final class ABnf
 
     public static function isCr($char)
     {
-        return "\r" == $char;
+        return self::CR == $char;
     }
 
     public static function isLf($char)
     {
-        return "\n" == $char;
+        return self::LF == $char;
     }
 
     public static function isCrLf($char)
