@@ -10,45 +10,49 @@
 namespace Panlatent\Annotation\Parser;
 
 use Panlatent\Boost\BStack;
+use Panlatent\Boost\ObjectStorage;
 
 class Dispatcher
 {
-    /**
-     * @var \Generator
-     */
-    protected $generator;
+    protected $bind = [];
 
     /**
      * @var \Panlatent\Boost\BStack
      */
-    protected $receivers;
+    protected $stack;
 
-    public function __construct(\Generator $generator)
+    public function __construct()
     {
-        $this->generator = $generator;
-        $this->receivers = new BStack();
+        $this->stack = new BStack();
     }
 
-    public function transfer($receiver)
+    public function bind(GeneratorInterface $processor)
     {
-        $this->receivers->push($receiver);
+        $this->bind[get_class($processor)] = $processor;
     }
 
-    public function flush()
+    public function call($name)
     {
-        $this->receivers->pop();
+        if ( !isset($this->bind[$name])) {
+
+        }
+
+        $this->stack->push($this->bind[$name]);
     }
 
     public function handle()
     {
-        for ($stream = $this->generator;
-             $stream->valid() && $value = $stream->current();
-             $stream->next()) {
-
-            $receiver = $this->receivers->top();
-            call_user_func($receiver, $value, $stream, $this);
+        $lastReturn = '';
+        for (;
+            ! $this->stack->isEmpty() &&
+            /** @var \Panlatent\Annotation\Parser\GeneratorInterface $top */
+            ($top = $this->stack->top()) &&
+            ($generator = $top->getGenerator()) &&
+            $generator->valid()
+        ; $generator->next()) {
+            $lastReturn = $generator->current();
         }
 
-        return $stream->getReturn();
+        return $lastReturn;
     }
 }

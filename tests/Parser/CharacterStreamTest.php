@@ -9,7 +9,7 @@
 
 namespace Tests\Parser;
 
-use Panlatent\Annotation\Parser\CharacterStream;
+use Panlatent\Annotation\Parser\CharacterScanner;
 use PHPUnit\Framework\TestCase;
 
 class CharacterStreamTest extends TestCase
@@ -17,8 +17,8 @@ class CharacterStreamTest extends TestCase
     public function testGenerator()
     {
         $actual = '';
-        $stream = new CharacterStream('HelloWorld');
-        foreach ($stream->generator() as $char) {
+        $stream = new CharacterScanner('HelloWorld');
+        foreach ($stream->scan() as $char) {
             $actual .= $char;
         }
         $this->assertEquals('HelloWorld', substr($actual, 0, -1));
@@ -30,9 +30,9 @@ class CharacterStreamTest extends TestCase
         $good = require(__DIR__ . '/../_data/phpdoc_good_example.php');
         foreach ($good as $key => $value) {
             $i = 0;
-            $stream = new CharacterStream($value);
+            $stream = new CharacterScanner($value);
             $value .= "\0";
-            foreach ($stream->generator() as $char) {
+            foreach ($stream->scan() as $char) {
                 $this->assertEquals($value[$i++], $char);
             }
         }
@@ -45,7 +45,7 @@ class CharacterStreamTest extends TestCase
     {
         $good = require(__DIR__ . '/../_data/phpdoc_good_example.php');
         foreach ($good as $key => $value) {
-            $stream = new CharacterStream($value);
+            $stream = new CharacterScanner($value);
             $lines = explode("\n", $value);
             is_string($lines) and $lines = [$lines];
             for ($i = 0; $i < count($lines); ++$i) {
@@ -63,7 +63,7 @@ class CharacterStreamTest extends TestCase
 
     public function testExpected()
     {
-        $stream = new CharacterStream('ABCDEFG');
+        $stream = new CharacterScanner('ABCDEFG');
         $stream->skip(3);
         $this->assertTrue($stream->expected('E'));
         $this->assertFalse($stream->expected('F'));
@@ -72,7 +72,7 @@ class CharacterStreamTest extends TestCase
 
     public function testTrace()
     {
-        $stream = new CharacterStream('ABCDEFG');
+        $stream = new CharacterScanner('ABCDEFG');
         $this->assertFalse($stream->trace('A'));
         $stream->skip(3);
         $this->assertTrue($stream->trace('C'));

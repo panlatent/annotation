@@ -9,12 +9,17 @@
 
 namespace Panlatent\Annotation\Parser;
 
-class CharacterStream implements SyntaxPositionInterface
+class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
 {
     /**
      * @var string
      */
     protected $content;
+
+    /**
+     * @var \Generator
+     */
+    protected $generator;
 
     /**
      * @var int
@@ -44,13 +49,22 @@ class CharacterStream implements SyntaxPositionInterface
     public function __construct($content)
     {
         $this->content = $content;
+        $this->generator = $this->scan();
         $this->length = strlen($content);
     }
 
     /**
      * @return \Generator
      */
-    public function generator()
+    public function getGenerator()
+    {
+        return $this->generator;
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function scan()
     {
         $this->lineNumber = 1;
         $this->columnNumber = 1;

@@ -26,28 +26,9 @@ use Panlatent\Boost\BStack;
 /**
  * Class LexicalAnalyzer
  *
- * The PHPDoc format has the following ABNF definition:
- * @see https://github.com/phpDocumentor/fig-standards/blob/master/proposed/phpdoc.md#5-the-phpdoc-format
- * ============================================================================
- * PHPDoc             = [summary] [description] [tags]
- * inline-phpdoc      = "{" *SP PHPDoc *SP "}"
- * summary            = *CHAR ("." 1*CRLF / 2*CRLF)
- * description        = 1*(CHAR / inline-tag) 1*CRLF ; any amount of characters
- * ; with inline tags inside
- * tags               = *(tag 1*CRLF)
- * inline-tag         = "{" tag "}"
- * tag                = "@" tag-name [":" tag-specialization] [tag-details]
- * tag-name           = (ALPHA / "\") *(ALPHA / DIGIT / "\" / "-" / "_")
- * tag-specialization = 1*(ALPHA / DIGIT / "-")
- * tag-details        = *SP (SP tag-description / tag-signature / inline-phpdoc)
- * tag-description    = 1*(CHAR / CRLF)
- * tag-signature      = "(" *tag-argument ")"
- * tag-argument       = *SP 1*CHAR [","] *SP
- * ============================================================================
- *
  * @package Panlatent\Annotation\Parser
  */
-class LexicalAnalyzer
+class LexicalAnalyzer implements GeneratorInterface
 {
     const STATUS_SPACE = 0;
     const STATUS_PHPDOC = 1;
@@ -67,26 +48,44 @@ class LexicalAnalyzer
 
     protected $generateDebugToken = true;
 
-    public function __construct()
-    {
+    protected $scanner;
 
+    protected $generator;
+
+    protected $stack;
+
+    protected $status;
+
+    public function __construct(CharacterScanner $scanner)
+    {
+        $this->scanner = $scanner;
+        $this->generator = $this->tokenization();
+        $this->stack = new BStack();
+        $this->status = new Status();
     }
 
     /**
-     * @param $docComment
+     * @return \Generator
+     */
+    public function getGenerator()
+    {
+        return $this->generator;
+    }
+
+    /**
      * @return \Generator
      * @throws \Panlatent\Annotation\Parser\SyntaxException
      */
-    public function tokenization($docComment)
+    public function tokenization()
     {
-        $stream = new CharacterStream($docComment);
+        $scanner = $this->scanner;
+        $stack = $this->stack;
+        $status = $this->status;
         $token = new Token();
-        $stack = new BStack();
-        $status = new Status();
-        $scanner = false;
-//        $dispatcher = new Dispatcher($stream->generator());
 
-        foreach ($stream->generator() as $char) {
+        // $scanner = false;
+
+        foreach ($scanner->scan() as $char) {
             if ("\0" == $char) {
                 break;
             }
@@ -100,26 +99,26 @@ class LexicalAnalyzer
                     }
                     if ('@' == $char) {
                         $status->add(self::STATUS_TAG);
-                        $token = TagToken::factory($stream->getPosition());
+                        $token = TagToken::factory($scanner->getPosition());
                         continue;
                     }
                     if ( ! $status->has(self::STATUS_SUMMARY)) {
                         $status->add(self::STATUS_SUMMARY);
-                        $token = SummaryToken::factory($stream->getPosition());
+                        $token = SummaryToken::factory($scanner->getPosition());
                         $token->value .= $char;
                         continue;
                     }
 
-                    throw new SyntaxException('Unknown format', $stream);
+                    throw new SyntaxException('Unknown format', $scanner);
 
                 case SummaryToken::class:
 
                     if ('.' == $char || "\n" == $char) {
                         $token->value .= $char;
-                        while ($stream->expected(" \t")) {
-                            $stream->skip();
+                        while ($scanner->expected(" \t")) {
+                            $scanner->skip();
                         }
-                        if ($stream->expected("\n")) {
+                        if ($scanner->expected("\n")) {
                             yield $token;
                             $token = new DescriptionToken();
                         }
@@ -130,13 +129,13 @@ class LexicalAnalyzer
                         continue;
                     }
 
-                    throw new SyntaxException('Unexpected summary', $stream);
+                    throw new SyntaxException('Unexpected summary', $scanner);
 
                 case DescriptionToken::class:
 
                     if ('@' == $char) {
                         yield $token;
-                        $token = TagToken::factory($stream->getPosition());
+                        $token = TagToken::factory($scanner->getPosition());
                         continue;
                     }
                     if (1) {
@@ -144,24 +143,24 @@ class LexicalAnalyzer
                             if (ABnfAssess::isLWsp($char)) {
                                 continue;
                             }
-                            $token->setPosition($stream->getPosition());
+                            $token->setPosition($scanner->getPosition());
                         }
                         $token->value .= $char;
                         continue;
                     }
 
-                    throw new SyntaxException('Unexpected description', $stream);
+                    throw new SyntaxException('Unexpected description', $scanner);
 
                 case TagToken::class:
 
                     if (ABnfAssess::isAlpha($char) || '\\' == $char) {
                         yield $token;
-                        $token = TagNameToken::factory($stream->getPosition());
+                        $token = TagNameToken::factory($scanner->getPosition());
                         $token->value .= $char;
                         continue;
                     }
 
-                    throw new SyntaxException('Unexpected tag name', $stream);
+                    throw new SyntaxException('Unexpected tag name', $scanner);
 
                 case TagNameToken::class:
 
@@ -181,7 +180,7 @@ class LexicalAnalyzer
                         continue;
                     }
 
-                    throw new SyntaxException('Unexpected tag name', $stream);
+                    throw new SyntaxException('Unexpected tag name', $scanner);
 
                 case TagSpecializationToken::class:
 
@@ -195,7 +194,7 @@ class LexicalAnalyzer
                         continue;
                     }
 
-                    throw new SyntaxException('Unexpected tag specialization', $stream);
+                    throw new SyntaxException('Unexpected tag specialization', $scanner);
 
                 case TagDetailsToken::class:
 
@@ -204,12 +203,12 @@ class LexicalAnalyzer
                     }
 
                     if (empty($token->value)) {
-                        $token->setPosition($stream->getPosition());
+                        $token->setPosition($scanner->getPosition());
                     }
 
                     if ($receive = (yield $token)) {
                         if (is_callable($receive)) {
-                            $scanner = call_user_func($receive, $token, $stream, $stack, $status);
+                            $scanner = call_user_func($receive, $token, $scanner, $stack, $status);
                         } else {
                             // @todo
                         }
@@ -218,41 +217,41 @@ class LexicalAnalyzer
                         continue;
                     } else {
                         if ('{' == $char) {
-                            $token = InlineStartToken::factory($stream->getPosition()); // A Inline PHPDoc
+                            $token = InlineStartToken::factory($scanner->getPosition()); // A Inline PHPDoc
                             yield $token;
                             $token = new Token();
                             continue;
                         } elseif ('(' == $char) {
-                            $token = TagSignatureToken::factory($stream->getPosition());
+                            $token = TagSignatureToken::factory($scanner->getPosition());
                             continue;
                         } else {
-                            $token = TagDescriptionToken::factory($stream->getPosition());
+                            $token = TagDescriptionToken::factory($scanner->getPosition());
                             $token->value .= $char;
                             continue;
                         }
 
                         continue;
                     }
-                    // throw new SyntaxException('Unexpected tag details', $stream);
+                    // throw new SyntaxException('Unexpected tag details', $scanner);
 
                 case TagDescriptionToken::class:
 
                     if ($stack->isEmpty() && "\n" == $char) {
                         $token->value .= $char;
-                        while ($stream->expected(" \t")) {
-                            $stream->skip();
+                        while ($scanner->expected(" \t")) {
+                            $scanner->skip();
                         }
-                        if ($stream->expected('@')) {
-                            $stream->skip();
+                        if ($scanner->expected('@')) {
+                            $scanner->skip();
                             yield $token;
-                            $token = TagToken::factory($stream->getPosition());
+                            $token = TagToken::factory($scanner->getPosition());
                             continue;
                         }
 
                         continue;
-                    } elseif ('{' == $char && ! $stream->trace('\\')) {
+                    } elseif ('{' == $char && ! $scanner->trace('\\')) {
                         $stack->push('{');
-                    } elseif ('}' == $char && ! $stream->trace('\\')) {
+                    } elseif ('}' == $char && ! $scanner->trace('\\')) {
                         $stack->pop();
                     }
 
@@ -260,17 +259,17 @@ class LexicalAnalyzer
 
                     continue;
 
-                // throw new SyntaxException('Unexpected tag description', $stream);
+                // throw new SyntaxException('Unexpected tag description', $scanner);
 
                 case TagSignatureToken::class:
 
-                    throw new SyntaxException('Unexpected tag signature', $stream);
+                    throw new SyntaxException('Unexpected tag signature', $scanner);
 
                 //case TagInline
 
                 case TagArgumentToken::class:
 
-                    throw new SyntaxException('Unexpected tag argument', $stream);
+                    throw new SyntaxException('Unexpected tag argument', $scanner);
 
                 default:
                     if (is_object($scanner) &&
@@ -281,7 +280,7 @@ class LexicalAnalyzer
                         $scanner->next();
                     }
 
-                    throw new SyntaxException('Unexpected token class "' . get_class($token) . '"', $stream);
+                    throw new SyntaxException('Unexpected token class "' . get_class($token) . '"', $scanner);
 
             } // The Switch End.
 
@@ -291,7 +290,7 @@ class LexicalAnalyzer
             if (get_class($token) != Token::class) {
                 yield $token;
             }
-            yield FinalToken::factory($stream->getPosition());
+            yield FinalToken::factory($scanner->getPosition());
         }
     }
 

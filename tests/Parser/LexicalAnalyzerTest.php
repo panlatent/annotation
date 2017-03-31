@@ -9,6 +9,7 @@
 
 namespace Tests\Parser;
 
+use Panlatent\Annotation\Parser\CharacterScanner;
 use Panlatent\Annotation\Parser\LexicalAnalyzer;
 use Panlatent\Annotation\Parser\Preprocessor;
 use Panlatent\Annotation\Parser\SyntaxException;
@@ -22,10 +23,11 @@ class LexicalAnalyzerTest extends TestCase
         $good = require(__DIR__ . '/../_data/phpdoc_good_expected.php');
         $expected = require(__DIR__ . '/../_data/lexer_expected.php');
 
-        $lexer = new LexicalAnalyzer();
+
         foreach ($good as $key => $value) {
             $list = array_reverse($expected[$key]);
-            foreach ($lexer->tokenization($value) as $token) {
+            $lexer = new LexicalAnalyzer(new CharacterScanner($value));
+            foreach ($lexer->tokenization() as $token) {
                 $this->assertEquals(array_pop($list), get_class($token), "Content in $key");
             }
             $this->assertEmpty($list, 'Expected tokens remaining or actual tokens missing');
@@ -38,9 +40,9 @@ class LexicalAnalyzerTest extends TestCase
         $bad = require(__DIR__ . '/../_data/phpdoc_bad_example.php');
 
         $content = (new Preprocessor())->preprocessor($bad['tag_end_attach']);
-        $lexer = new LexicalAnalyzer();
         foreach ($bad as $key => $value) {
-            foreach ($lexer->tokenization($content) as $token) {
+            $lexer = new LexicalAnalyzer(new CharacterScanner($content));
+            foreach ($lexer->tokenization() as $token) {
                 $this->assertInstanceOf(Token::class, $token);
             }
         }
