@@ -9,7 +9,7 @@
 
 namespace Panlatent\Annotation\Parser;
 
-class Token
+class Token implements SyntaxPositionInterface
 {
     /**
      * @var string
@@ -19,12 +19,12 @@ class Token
     /**
      * @var int
      */
-    protected $line;
+    protected $lineNumber;
 
     /**
      * @var int
      */
-    protected $column;
+    protected $columnNumber;
 
     /**
      * Token constructor.
@@ -34,8 +34,8 @@ class Token
      */
     public function __construct($line = null, $column = null)
     {
-        $this->line = $line;
-        $this->column = $column;
+        $this->lineNumber = $line;
+        $this->columnNumber = $column;
     }
 
     /**
@@ -48,19 +48,36 @@ class Token
     }
 
     /**
-     * @return int
+     * @todo
+     * @return string
      */
-    public function getLine()
+    public function getContext()
     {
-        return $this->line;
+        return '';
     }
 
     /**
      * @return int
      */
-    public function getColumn()
+    public function getLineNumber()
     {
-        return $this->column;
+        return $this->lineNumber;
+    }
+
+    /**
+     * @return int
+     */
+    public function getColumnNumber()
+    {
+        return $this->columnNumber;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPosition()
+    {
+        return [$this->lineNumber, $this->columnNumber];
     }
 
     /**
