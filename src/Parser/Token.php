@@ -85,7 +85,7 @@ class Token implements SyntaxPositionInterface
      */
     public function setPosition(array $position)
     {
-        $this->line = $position[0];
-        $this->column = $position[1];
+        $this->lineNumber = $position[0];
+        $this->columnNumber = $position[1];
     }
 }
