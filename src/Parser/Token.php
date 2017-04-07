@@ -9,7 +9,7 @@
 
 namespace Panlatent\Annotation\Parser;
 
-class Token implements SyntaxPositionInterface
+class Token implements ContextPositionInterface
 {
     /**
      * @var string

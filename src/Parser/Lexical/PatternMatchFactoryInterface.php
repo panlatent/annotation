@@ -7,9 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser;
+namespace Panlatent\Annotation\Parser\Lexical;
 
-interface Dispatchable
+interface PatternMatchFactoryInterface extends AbstractFactoryInterface
 {
-    public function transfer();
+    public static function create($content);
 }

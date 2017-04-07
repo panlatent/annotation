@@ -9,7 +9,7 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\Parser\PatternMatchFactoryInterface;
+use Panlatent\Annotation\Parser\Lexical\PatternMatchFactoryInterface;
 use Panlatent\Annotation\TagAbstract;
 
 final class AuthorTag extends TagAbstract implements PatternMatchFactoryInterface

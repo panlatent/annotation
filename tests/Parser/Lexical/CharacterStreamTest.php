@@ -7,9 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Tests\Parser;
+namespace Tests\Parser\Lexical;
 
-use Panlatent\Annotation\Parser\CharacterScanner;
+use Panlatent\Annotation\Parser\Lexical\CharacterScanner;
 use PHPUnit\Framework\TestCase;
 
 class CharacterStreamTest extends TestCase
@@ -27,7 +27,7 @@ class CharacterStreamTest extends TestCase
 
     public function testGetPosition()
     {
-        $good = require(__DIR__ . '/../_data/phpdoc_good_example.php');
+        $good = require(__DIR__ . '/../../_data/phpdoc_good_example.php');
         foreach ($good as $key => $value) {
             $i = 0;
             $stream = new CharacterScanner($value);
@@ -43,7 +43,7 @@ class CharacterStreamTest extends TestCase
      */
     public function testGetContext()
     {
-        $good = require(__DIR__ . '/../_data/phpdoc_good_example.php');
+        $good = require(__DIR__ . '/../../_data/phpdoc_good_example.php');
         foreach ($good as $key => $value) {
             $stream = new CharacterScanner($value);
             $lines = explode("\n", $value);

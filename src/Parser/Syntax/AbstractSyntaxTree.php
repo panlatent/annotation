@@ -7,9 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser;
+namespace Panlatent\Annotation\Parser\Syntax;
 
-interface PatternMatchFactoryInterface extends AbstractFactoryInterface
+class AbstractSyntaxTree
 {
-    public static function create($content);
+
 }

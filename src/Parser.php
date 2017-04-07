@@ -9,12 +9,11 @@
 
 namespace Panlatent\Annotation;
 
-use Panlatent\Annotation\Parser\CharacterScanner;
-use Panlatent\Annotation\Parser\Dispatcher;
 use Panlatent\Annotation\Parser\Exception as ParserException;
-use Panlatent\Annotation\Parser\SyntaxAnalyzer;
-use Panlatent\Annotation\Parser\LexicalAnalyzer;
+use Panlatent\Annotation\Parser\Lexical\CharacterScanner;
+use Panlatent\Annotation\Parser\Lexical\LexicalAnalyzer;
 use Panlatent\Annotation\Parser\Preprocessor;
+use Panlatent\Annotation\Parser\Syntax\SyntaxAnalyzer;
 
 class Parser
 {
@@ -50,17 +49,11 @@ class Parser
         }
         $phpdoc = $preprocessor->preprocessor($docComment);
 
-        $dispatcher = new Dispatcher();
         $scanner = new CharacterScanner($phpdoc);
         $lexer = new LexicalAnalyzer($scanner);
         $syntax = new SyntaxAnalyzer($lexer, $this->tagVendor);
 
-        $dispatcher->bind($scanner);
-        $dispatcher->bind($lexer);
-        $dispatcher->bind($syntax);
-        $dispatcher->call(SyntaxAnalyzer::class);
-
-        return $dispatcher->handle();
+        return new PhpDoc();
     }
 
     /**

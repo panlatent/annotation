@@ -7,9 +7,20 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser;
+/**
+ * Annotation - Parsing PHPDoc style annotations from comments
+ *
+ * @author  panlatent@gmail.com
+ * @link    https://github.com/panlatent/annotation
+ * @license https://opensource.org/licenses/MIT
+ */
 
-class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
+namespace Panlatent\Annotation\Parser\Lexical;
+
+use Panlatent\Annotation\Parser\ContextPositionInterface;
+use Panlatent\Annotation\Parser\GeneratorInterface;
+
+class CharacterScanner implements GeneratorInterface, ContextPositionInterface
 {
     /**
      * @var string
@@ -56,7 +67,7 @@ class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
     /**
      * @return \Generator
      */
-    public function getGenerator()
+    public function generator()
     {
         return $this->generator;
     }
@@ -71,9 +82,8 @@ class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
 
         for ($this->index = 0; $this->index < $this->length; ++$this->index) {
             $c = $this->content[$this->index];
-            if (yield $c) {
-                //yield [$lineNumber, $columnNumber];
-            }
+
+            yield $c;
 
             if ("\n" == $c) {
                 ++$this->lineNumber;
@@ -132,6 +142,9 @@ class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
         return false;
     }
 
+    /**
+     * @param int $number
+     */
     public function back($number = 1)
     {
         $this->index -= $number;
@@ -140,11 +153,17 @@ class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
         }
     }
 
+    /**
+     * @param int $number
+     */
     public function skip($number = 1)
     {
         $this->index += $number;
     }
 
+    /**
+     * @return string
+     */
     public function getChar()
     {
         return $this->content[$this->index];
@@ -190,11 +209,17 @@ class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
         return $this->columnNumber;
     }
 
+    /**
+     * @return array
+     */
     public function getPosition()
     {
         return [$this->lineNumber, $this->columnNumber];
     }
 
+    /**
+     * @return string
+     */
     public function getPreviousLine()
     {
         $pos = $this->getCurrentLineBorderPos();
@@ -210,6 +235,9 @@ class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
         return substr($this->content, $left, $pos[0] - $left);
     }
 
+    /**
+     * @return string
+     */
     public function getCurrentLine()
     {
         $pos = $this->getCurrentLineBorderPos();
@@ -217,6 +245,9 @@ class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
         return substr($this->content, $pos[0] + 1, $pos[1] - $pos[0] - 1);
     }
 
+    /**
+     * @return string
+     */
     public function getNextLine()
     {
         $pos = $this->getCurrentLineBorderPos();
@@ -229,6 +260,9 @@ class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
         return substr($this->content, $pos[1] + 1, $right - $pos[1] - 1);
     }
 
+    /**
+     * @return array
+     */
     public function getContext()
     {
         return [
@@ -238,6 +272,9 @@ class CharacterScanner implements GeneratorInterface, SyntaxPositionInterface
         ];
     }
 
+    /**
+     * @return array
+     */
     protected function getCurrentLineBorderPos()
     {
         if ($this->index == 0) {

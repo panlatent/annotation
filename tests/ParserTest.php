@@ -10,6 +10,7 @@
 namespace Tests;
 
 use Panlatent\Annotation\Parser;
+use Panlatent\Annotation\PhpDoc;
 use PHPUnit\Framework\TestCase;
 
 class ParserTest extends TestCase
@@ -22,6 +23,7 @@ class ParserTest extends TestCase
         $parser->getTagVendor()->withDeprecated();
         foreach ($good as $key => $value) {
             $phpdoc = $parser->parser($value);
+            $this->assertInstanceOf(PhpDoc::class, $phpdoc);
         }
     }
 }

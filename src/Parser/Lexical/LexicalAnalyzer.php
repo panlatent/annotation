@@ -7,11 +7,14 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser;
+namespace Panlatent\Annotation\Parser\Lexical;
 
+use Panlatent\Annotation\Parser\GeneratorInterface;
+use Panlatent\Annotation\Parser\Status;
+use Panlatent\Annotation\Parser\Syntax\SyntaxException;
+use Panlatent\Annotation\Parser\Token;
 use Panlatent\Annotation\Parser\Token\DescriptionToken;
 use Panlatent\Annotation\Parser\Token\FinalToken;
-//use Panlatent\Annotation\Parser\Token\InlineEndToken;
 use Panlatent\Annotation\Parser\Token\InlineStartToken;
 use Panlatent\Annotation\Parser\Token\SummaryToken;
 use Panlatent\Annotation\Parser\Token\TagArgumentToken;
@@ -21,7 +24,6 @@ use Panlatent\Annotation\Parser\Token\TagNameToken;
 use Panlatent\Annotation\Parser\Token\TagSignatureToken;
 use Panlatent\Annotation\Parser\Token\TagSpecializationToken;
 use Panlatent\Annotation\Parser\Token\TagToken;
-use Panlatent\Boost\BStack;
 
 /**
  * Class LexicalAnalyzer
@@ -52,38 +54,32 @@ class LexicalAnalyzer implements GeneratorInterface
 
     protected $generator;
 
-    protected $stack;
-
     protected $status;
 
     public function __construct(CharacterScanner $scanner)
     {
         $this->scanner = $scanner;
         $this->generator = $this->tokenization();
-        $this->stack = new BStack();
         $this->status = new Status();
     }
 
     /**
      * @return \Generator
      */
-    public function getGenerator()
+    public function generator()
     {
         return $this->generator;
     }
 
     /**
      * @return \Generator
-     * @throws \Panlatent\Annotation\Parser\SyntaxException
+     * @throws \Panlatent\Annotation\Parser\Syntax\SyntaxException
      */
     public function tokenization()
     {
         $scanner = $this->scanner;
-        $stack = $this->stack;
         $status = $this->status;
         $token = new Token();
-
-        // $scanner = false;
 
         foreach ($scanner->scan() as $char) {
             if ("\0" == $char) {
@@ -206,37 +202,29 @@ class LexicalAnalyzer implements GeneratorInterface
                         $token->setPosition($scanner->getPosition());
                     }
 
-                    if ($receive = (yield $token)) {
-                        if (is_callable($receive)) {
-                            $scanner = call_user_func($receive, $token, $scanner, $stack, $status);
-                        } else {
-                            // @todo
-                        }
+                    yield $token;
 
-
+                    if ('{' == $char) {
+                        $token = InlineStartToken::factory($scanner->getPosition()); // A Inline PHPDoc
+                        yield $token;
+                        $token = new Token();
+                        continue;
+                    } elseif ('(' == $char) {
+                        $token = TagSignatureToken::factory($scanner->getPosition());
                         continue;
                     } else {
-                        if ('{' == $char) {
-                            $token = InlineStartToken::factory($scanner->getPosition()); // A Inline PHPDoc
-                            yield $token;
-                            $token = new Token();
-                            continue;
-                        } elseif ('(' == $char) {
-                            $token = TagSignatureToken::factory($scanner->getPosition());
-                            continue;
-                        } else {
-                            $token = TagDescriptionToken::factory($scanner->getPosition());
-                            $token->value .= $char;
-                            continue;
-                        }
-
+                        $token = TagDescriptionToken::factory($scanner->getPosition());
+                        $token->value .= $char;
                         continue;
                     }
+
+                    continue;
+
                     // throw new SyntaxException('Unexpected tag details', $scanner);
 
                 case TagDescriptionToken::class:
 
-                    if ($stack->isEmpty() && "\n" == $char) {
+                    if ("\n" == $char) { // $stack->isEmpty() &&
                         $token->value .= $char;
                         while ($scanner->expected(" \t")) {
                             $scanner->skip();
@@ -249,11 +237,11 @@ class LexicalAnalyzer implements GeneratorInterface
                         }
 
                         continue;
-                    } elseif ('{' == $char && ! $scanner->trace('\\')) {
-                        $stack->push('{');
-                    } elseif ('}' == $char && ! $scanner->trace('\\')) {
-                        $stack->pop();
-                    }
+                    } // elseif ('{' == $char && ! $scanner->trace('\\')) {
+//                        $stack->push('{');
+//                    } elseif ('}' == $char && ! $scanner->trace('\\')) {
+//                        $stack->pop();
+//                    }
 
                     $token->value .= $char;
 
@@ -292,10 +280,5 @@ class LexicalAnalyzer implements GeneratorInterface
             }
             yield FinalToken::factory($scanner->getPosition());
         }
-    }
-
-    public function evaluator()
-    {
-
     }
 }

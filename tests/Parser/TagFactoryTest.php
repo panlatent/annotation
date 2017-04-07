@@ -9,7 +9,7 @@
 
 namespace Tests\Parser;
 
-use Panlatent\Annotation\Parser\PatternMatchFactoryInterface;
+use Panlatent\Annotation\Parser\Lexical\PatternMatchFactoryInterface;
 use Panlatent\Annotation\Parser\TagFactory;
 use Panlatent\Annotation\Tag\ApiTag;
 use Panlatent\Annotation\Tag\AuthorTag;

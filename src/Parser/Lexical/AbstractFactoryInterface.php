@@ -7,12 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser;
+namespace Panlatent\Annotation\Parser\Lexical;
 
-interface GeneratorInterface
+interface AbstractFactoryInterface
 {
-    /**
-     * @return \Generator
-     */
-    public function generator();
+
 }

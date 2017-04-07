@@ -7,10 +7,13 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser;
+namespace Panlatent\Annotation\Parser\Syntax;
 
-use Panlatent\Annotation\Parser\LexicalScanFactoryInterface;
-use Panlatent\Annotation\Parser\PatternMatchFactoryInterface;
+use Panlatent\Annotation\Parser\GeneratorInterface;
+use Panlatent\Annotation\Parser\Lexical\LexicalAnalyzer;
+use Panlatent\Annotation\Parser\Lexical\LexicalScanFactoryInterface;
+use Panlatent\Annotation\Parser\Lexical\PatternMatchFactoryInterface;
+use Panlatent\Annotation\Parser\TagFactory;
 use Panlatent\Annotation\Parser\Token\DescriptionToken;
 use Panlatent\Annotation\Parser\Token\FinalToken;
 use Panlatent\Annotation\Parser\Token\SummaryToken;
@@ -46,14 +49,14 @@ class SyntaxAnalyzer implements GeneratorInterface
     /**
      * @return \Generator
      */
-    public function getGenerator()
+    public function generator()
     {
         return $this->generator;
     }
 
     /**
      * @return \Generator
-     * @throws \Panlatent\Annotation\Parser\SyntaxException
+     * @throws \Panlatent\Annotation\Parser\Syntax\SyntaxException
      */
     public function phpdocization()
     {
@@ -119,7 +122,7 @@ class SyntaxAnalyzer implements GeneratorInterface
                 case TagDescriptionToken::class:
 
                     if ($this->tagFactory->isFactory(PatternMatchFactoryInterface::class)) {
-                        /** @var \Panlatent\Annotation\Parser\PatternMatchFactoryInterface $tag */
+                        /** @var \Panlatent\Annotation\Parser\Lexical\PatternMatchFactoryInterface $tag */
                         $this->tagFactory->create();
                         //$tag->($token->value);
                     } else {
@@ -135,6 +138,7 @@ class SyntaxAnalyzer implements GeneratorInterface
                     if ($this->tagFactory->hasInstance()) {
                         $this->phpdocFactory->addTag($this->tagFactory->getInstance());
                     }
+                    yield $this->phpdocFactory->create();
                     break;
 
                 default:
@@ -143,7 +147,5 @@ class SyntaxAnalyzer implements GeneratorInterface
 
             } // The Switch End
         } // The Foreach End
-
-        yield $this->phpdocFactory->create();
     }
 }

@@ -9,7 +9,13 @@
 
 namespace Panlatent\Annotation\Parser;
 
-interface AbstractFactoryInterface
+interface ContextPositionInterface
 {
+    public function getPosition();
 
+    public function getLineNumber();
+
+    public function getColumnNumber();
+
+    public function getContext();
 }

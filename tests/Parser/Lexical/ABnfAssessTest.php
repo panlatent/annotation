@@ -7,9 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Tests\Parser;
+namespace Tests\Parser\Lexical;
 
-use Panlatent\Annotation\Parser\ABnfAssess;
+use Panlatent\Annotation\Parser\Lexical\ABnfAssess;
 use PHPUnit\Framework\TestCase;
 
 class ABnfAssessTest extends TestCase

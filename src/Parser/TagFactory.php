@@ -9,6 +9,9 @@
 
 namespace Panlatent\Annotation\Parser;
 
+use Panlatent\Annotation\Parser\Lexical\AbstractFactoryInterface;
+use Panlatent\Annotation\Parser\Lexical\LexicalScanFactoryInterface;
+use Panlatent\Annotation\Parser\Lexical\PatternMatchFactoryInterface;
 use Panlatent\Annotation\Tag;
 
 class TagFactory
@@ -52,17 +55,17 @@ class TagFactory
 
         $product = $this->product;
         if ($this->isFactory(LexicalScanFactoryInterface::class)) {
-            /** @var \Panlatent\Annotation\Parser\LexicalScanFactoryInterface $product */
+            /** @var \Panlatent\Annotation\Parser\Lexical\LexicalScanFactoryInterface $product */
             // return $this->instance = $product::create();
         } elseif ($this->isFactory(PatternMatchFactoryInterface::class)) {
-            /** @var \Panlatent\Annotation\Parser\PatternMatchFactoryInterface $product */
+            /** @var \Panlatent\Annotation\Parser\Lexical\PatternMatchFactoryInterface $product */
             return $this->instance = $product::create($this->description);
         } elseif ($this->isFactory(Tag::class)) {
             /** @var \Panlatent\Annotation\Tag $product */
             return $this->instance = $product::create($this->name, $this->description);
         }
 
-        return $this->instance = new $product();
+        return $this->instance = new $product($this->name, $this->description);
     }
 
     public function getLexicalScanner()
@@ -120,7 +123,7 @@ class TagFactory
         $this->product = $className;
 
         if ($this->isFactory(LexicalScanFactoryInterface::class)) {
-            /** @var \Panlatent\Annotation\Parser\LexicalScanFactoryInterface $className */
+            /** @var \Panlatent\Annotation\Parser\Lexical\LexicalScanFactoryInterface $className */
             $this->lexicalScanner = [$className, 'create'];
         }
 

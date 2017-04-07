@@ -7,7 +7,10 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Parser;
+namespace Panlatent\Annotation\Parser\Syntax;
+
+use Panlatent\Annotation\Parser\ContextPositionInterface;
+use Panlatent\Annotation\Parser\Exception;
 
 class SyntaxException extends Exception
 {
@@ -20,13 +23,13 @@ class SyntaxException extends Exception
     /**
      * SyntaxException constructor.
      *
-     * @param string                                               $message
-     * @param \Panlatent\Annotation\Parser\SyntaxPositionInterface $position
-     * @param int                                                  $code
-     * @param \Exception|null                                      $previous
+     * @param string                                                $message
+     * @param \Panlatent\Annotation\Parser\ContextPositionInterface $position
+     * @param int                                                   $code
+     * @param \Exception|null                                       $previous
      * @internal param \Panlatent\Annotation\Parser\CharacterStream $stream
      */
-    public function __construct($message, SyntaxPositionInterface $position, $code = 0, \Exception $previous = null)
+    public function __construct($message, ContextPositionInterface $position, $code = 0, \Exception $previous = null)
     {
         $this->syntaxLine = $position->getLineNumber();
         $this->syntaxColumn = $position->getColumnNumber();
