@@ -7,6 +7,8 @@
  * @license https://opensource.org/licenses/MIT
  */
 
+$phpdoc = [];
+
 $phpdoc['single_line'] = <<<DOCEND
     Annotation - Parsing PHPDoc style annotations from comments.   
 DOCEND;
@@ -41,5 +43,22 @@ $phpdoc['with_tags'] = <<<DOCEND
    
 DOCEND;
 
-return $phpdoc;
+$phpdoc['inline_basic'] = <<<DOCEND
+   
+   A Basic Inline PHPDoc.
+  
+   {
+       This is a inline summary of parent description.
+  
+       This is a inline description of parent description
+       @return void
+   }
+   
+   @name {
+       This is a inline summary of parent tag.
+       @var int
+   }
+   
+DOCEND;
 
+return $phpdoc;

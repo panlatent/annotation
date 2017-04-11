@@ -9,137 +9,144 @@
 
 namespace Panlatent\Annotation\Parser\Syntax;
 
-use Panlatent\Annotation\Parser\GeneratorInterface;
+use Panlatent\Annotation\Parser\Exception;
 use Panlatent\Annotation\Parser\Lexical\LexicalAnalyzer;
-use Panlatent\Annotation\Parser\Lexical\LexicalScanFactoryInterface;
-use Panlatent\Annotation\Parser\Lexical\PatternMatchFactoryInterface;
-use Panlatent\Annotation\Parser\TagFactory;
+use Panlatent\Annotation\Parser\Status as StatusManager;
 use Panlatent\Annotation\Parser\Token\DescriptionToken;
 use Panlatent\Annotation\Parser\Token\FinalToken;
+use Panlatent\Annotation\Parser\Token\InlineEndToken;
+use Panlatent\Annotation\Parser\Token\InlineStartToken;
 use Panlatent\Annotation\Parser\Token\SummaryToken;
 use Panlatent\Annotation\Parser\Token\TagDescriptionToken;
 use Panlatent\Annotation\Parser\Token\TagDetailsToken;
 use Panlatent\Annotation\Parser\Token\TagNameToken;
 use Panlatent\Annotation\Parser\Token\TagToken;
-use Panlatent\Annotation\PhpDocFactory;
 use Panlatent\Annotation\TagSpecializationInterface;
-use Panlatent\Annotation\TagVendor;
+use Panlatent\Boost\BStack;
 
-class SyntaxAnalyzer implements GeneratorInterface
+class SyntaxAnalyzer
 {
+    /**
+     * @var \Panlatent\Annotation\Parser\Lexical\LexicalAnalyzer
+     */
     protected $lexer;
 
-    protected $generator;
+    /**
+     * @var \Panlatent\Boost\BStack
+     */
+    protected $stack;
 
-    protected $phpdocFactory;
+    /**
+     * @var \Panlatent\Annotation\Parser\Status
+     */
+    protected $status;
 
-    protected $tagFactory;
-
-    protected $tagVendor;
-
-    public function __construct(LexicalAnalyzer $lexer, TagVendor $tagVendor)
+    public function __construct(LexicalAnalyzer $lexer)
     {
         $this->lexer = $lexer;
-        $this->tagVendor = $tagVendor;
-        $this->generator = $this->phpdocization();
-        $this->phpdocFactory = new PhpDocFactory();
-        $this->tagFactory = new TagFactory();
+        $this->stack = new BStack();
+        $this->status = new StatusManager();
     }
 
     /**
-     * @return \Generator
-     */
-    public function generator()
-    {
-        return $this->generator;
-    }
-
-    /**
-     * @return \Generator
+     * @return array
+     * @throws \Panlatent\Annotation\Parser\Exception
      * @throws \Panlatent\Annotation\Parser\Syntax\SyntaxException
      */
     public function phpdocization()
     {
+        $phpdoc = $this->getEmptyPhpdoc();
+        $tag = $this->getEmptyTag();
+        $status = $this->getEmptyStatus();
+
         foreach ($this->lexer->tokenization() as $token) {
             /** @var \Panlatent\Annotation\Parser\Token $token */
             switch (get_class($token)) {
-                case SummaryToken::class:
 
-                    $this->phpdocFactory->setSummary($token->value);
+                case InlineStartToken::class:
 
-                    break;
-
-                case DescriptionToken::class:
-
-                    $this->phpdocFactory->setDescription($token->value);
-
-                    break;
-
-                case TagToken::class:
-
-                    if ($this->tagFactory->hasInstance()) {
-                        $this->phpdocFactory->addTag($this->tagFactory->getInstance());
-                    }
-                    $this->tagFactory = new TagFactory();
-
-                    break;
-
-                case TagNameToken::class:
-
-                    $this->tagFactory->setName($token->value);
-
-                    break;
-
-                case TagSpecializationInterface::class:
-
-                    $this->tagFactory->setSpecialization($token->value);
-
-                    break;
-
-                case TagDetailsToken::class:
-
-                    if (false !== ($tagClass = $this->tagVendor->get($this->tagFactory->getName()
-                            , $this->tagFactory->getSpecialization()))
-                    ) {
-                        $this->tagFactory->setProduct($tagClass);
-                    } else {
-                        $this->tagFactory->setProduct($this->tagVendor->getDefaultTag());
+                    if ($status->has(Status::SUMMARY)
+                        && ! $status->has(Status::DESCRIPTION)) {
+                        $this->stash($phpdoc, $tag, $status);
+                    } elseif ($status->has(Status::TAG_DETAILS)) {
+                        $this->stash($phpdoc, $tag, $status);
                     }
 
-                    if ($this->tagFactory->isFactory()) {
-                        if ($this->tagFactory->isFactory(LexicalScanFactoryInterface::class)) {
-                            $tagScanner = $this->tagFactory->getLexicalScanner();
-                            $tag = call_user_func($tagScanner);
-//                        $dispatcher->transfer(); // @todo
-//                        $stream->send($this->tagFactory->getLexicalScanner());
-                        } elseif ($this->tagFactory->isFactory(PatternMatchFactoryInterface::class)) {
-                            $tag = $this->tagFactory->create();
+                    continue;
+
+                case  InlineEndToken::class:
+
+                    if ( ! $this->stack->isEmpty()) {
+                        if ( ! empty($tag['name'])) {
+                            $phpdoc['tags'][] = $tag;
+                        }
+
+                        $stash = [$phpdoc, $tag, $status];
+                        $this->expose($phpdoc, $tag, $status);
+                        if ($status->has(Status::SUMMARY)
+                            && ! $status->has(Status::DESCRIPTION)) {
+                            $phpdoc['description'] = $stash[0];
+                            $status->add(Status::DESCRIPTION);
+                        } elseif ($status->has(Status::TAG_DETAILS)) {
+                            $tag['description'] = $stash[0];
                         }
                     }
 
-                    break;
+                    continue;
+
+                case SummaryToken::class:
+
+                    $phpdoc['summary'] = $token->value;
+                    $status->add(Status::SUMMARY);
+
+                    continue;
+
+                case DescriptionToken::class:
+
+                    $phpdoc['description'] = $token->value;
+                    $status->add(Status::DESCRIPTION);
+
+                    continue;
+
+                case TagToken::class:
+
+                    if ( ! empty($tag['name'])) {
+                        $phpdoc['tags'][] = $tag;
+                    }
+                    $tag = $this->getEmptyTag();
+
+                    continue;
+
+                case TagNameToken::class:
+
+                    $tag['name'] = $token->value;
+
+                    continue;
+
+                case TagSpecializationInterface::class:
+
+                    $tag['specialization'] = $token->value;
+
+                    continue;
+
+                case TagDetailsToken::class:
+
+                    $status->add(Status::TAG_DETAILS);
+
+                    continue;
 
                 case TagDescriptionToken::class:
 
-                    if ($this->tagFactory->isFactory(PatternMatchFactoryInterface::class)) {
-                        /** @var \Panlatent\Annotation\Parser\Lexical\PatternMatchFactoryInterface $tag */
-                        $this->tagFactory->create();
-                        //$tag->($token->value);
-                    } else {
-                        $this->tagFactory->setDescription($token->value);
-                        $this->tagFactory->create();
-                    }
+                    $tag['description'] = $token->value;
 
-
-                    break;
+                    continue;
 
                 case FinalToken::class:
 
-                    if ($this->tagFactory->hasInstance()) {
-                        $this->phpdocFactory->addTag($this->tagFactory->getInstance());
+                    if ( ! empty(['name'])) {
+                        $phpdoc['tags'][] = $tag;
                     }
-                    yield $this->phpdocFactory->create();
-                    break;
+                    return $phpdoc;
 
                 default:
 
@@ -147,5 +154,44 @@ class SyntaxAnalyzer implements GeneratorInterface
 
             } // The Switch End
         } // The Foreach End
+
+        throw new Exception('Unexpected final token');
+    }
+
+    protected function stash(&$phpdoc, &$tag, &$status)
+    {
+        $this->stack->push([$phpdoc, $tag, $status]);
+
+        $phpdoc = $this->getEmptyPhpdoc();
+        $tag = $this->getEmptyTag();
+        $status = $this->getEmptyStatus();
+    }
+
+    protected function expose(&$phpdoc, &$tag, &$status)
+    {
+        list($phpdoc, $tag, $status) = $this->stack->pop();
+    }
+
+    protected function getEmptyPhpdoc()
+    {
+        return [
+            'summary' => '',
+            'description' => '',
+            'tags' => []
+        ];
+    }
+
+    protected function getEmptyTag()
+    {
+        return [
+            'name' => '',
+            'specialization' => '',
+            'description' => '',
+        ];
+    }
+
+    protected function getEmptyStatus()
+    {
+        return new StatusManager();
     }
 }

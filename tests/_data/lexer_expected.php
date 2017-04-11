@@ -9,6 +9,8 @@
 
 use Panlatent\Annotation\Parser\Token\DescriptionToken;
 use Panlatent\Annotation\Parser\Token\FinalToken;
+use Panlatent\Annotation\Parser\Token\InlineEndToken;
+use Panlatent\Annotation\Parser\Token\InlineStartToken;
 use Panlatent\Annotation\Parser\Token\SummaryToken;
 use Panlatent\Annotation\Parser\Token\TagDescriptionToken;
 use Panlatent\Annotation\Parser\Token\TagDetailsToken;
@@ -54,6 +56,33 @@ $lexer['with_tags'] = [
     TagNameToken::class,
     TagDetailsToken::class,
     TagDescriptionToken::class,
+
+    FinalToken::class,
+];
+
+$lexer['inline_basic'] = [
+    SummaryToken::class,
+
+    InlineStartToken::class,
+    SummaryToken::class,
+    DescriptionToken::class,
+    TagToken::class,
+    TagNameToken::class,
+    TagDetailsToken::class,
+    TagDescriptionToken::class,
+    InlineEndToken::class,
+
+    TagToken::class,
+    TagNameToken::class,
+    TagDetailsToken::class,
+
+    InlineStartToken::class,
+    SummaryToken::class,
+    TagToken::class,
+    TagNameToken::class,
+    TagDetailsToken::class,
+    TagDescriptionToken::class,
+    InlineEndToken::class,
 
     FinalToken::class,
 ];

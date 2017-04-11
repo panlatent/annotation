@@ -12,8 +12,6 @@ namespace Tests\Parser\Syntax;
 use Panlatent\Annotation\Parser\Lexical\CharacterScanner;
 use Panlatent\Annotation\Parser\Lexical\LexicalAnalyzer;
 use Panlatent\Annotation\Parser\Syntax\SyntaxAnalyzer;
-use Panlatent\Annotation\PhpDoc;
-use Panlatent\Annotation\TagVendor;
 
 class SyntaxAnalyzerTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,16 +19,16 @@ class SyntaxAnalyzerTest extends \PHPUnit_Framework_TestCase
     {
         $good = require(__DIR__ . '/../../_data/phpdoc_good_expected.php');
 
-        $vendor = new TagVendor();
-        $vendor->withDeprecated();
         foreach ($good as $key => $value) {
-            $syntax = new SyntaxAnalyzer(new LexicalAnalyzer(new CharacterScanner($value)), $vendor);
-            $time = 0;
-            foreach ($syntax->phpdocization() as $phpdoc) {
-                $this->assertInstanceOf(PhpDoc::class, $phpdoc);
-                ++$time;
-            }
-            $this->assertEquals(1, $time);
+            $syntax = new SyntaxAnalyzer(new LexicalAnalyzer(new CharacterScanner($value)));
+            $this->assertNotEmpty($syntax->phpdocization());
         }
+    }
+
+    public function testPhpdocizationUsingInline()
+    {
+        $inline = require(__DIR__ . '/../../_data/phpdoc_good_expected.php');
+        $syntax = new SyntaxAnalyzer(new LexicalAnalyzer(new CharacterScanner($inline['inline_basic'])));
+        // var_export($syntax->phpdocization());
     }
 }

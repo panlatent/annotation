@@ -59,7 +59,7 @@ class Preprocessor
         if ($this->keepPosition) {
             $phpdoc = preg_replace('#^([ \t]*)\*\*?([ \t]{0,1})#um', '\1 \2', $docComment);
         } else {
-            $phpdoc = preg_replace('#^[ \t]*\*\*?[ \t]{0,1}#um', '', $docComment);
+            $phpdoc = preg_replace('#^[ \t]*\*\*?[ \t]*#um', '', $docComment);
         }
 
         return str_replace(["\r", "\r\n"], "\n", $phpdoc);

@@ -25,10 +25,12 @@ class LexicalAnalyzerTest extends TestCase
 
 
         foreach ($good as $key => $value) {
-            $list = array_reverse($expected[$key]);
+            $list = $expected[$key];
             $lexer = new LexicalAnalyzer(new CharacterScanner($value));
+            $i = 1;
             foreach ($lexer->tokenization() as $token) {
-                $this->assertEquals(array_pop($list), get_class($token), "Content in $key");
+                $i++;
+                $this->assertEquals(array_shift($list), get_class($token), "Not Equals in $key, value line $i");
             }
             $this->assertEmpty($list, 'Expected tokens remaining or actual tokens missing');
         }
