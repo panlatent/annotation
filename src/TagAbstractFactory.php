@@ -7,11 +7,9 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace Panlatent\Annotation\Tag;
+namespace Panlatent\Annotation;
 
-use Panlatent\Annotation\Tag;
-
-final class ApiTag extends Tag
+interface TagAbstractFactory
 {
-    protected $name = 'api';
+
 }

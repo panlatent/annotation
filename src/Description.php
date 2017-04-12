@@ -24,7 +24,7 @@ class Description
         $this->phpdoc = $phpdoc;
     }
 
-    public static function create($parser, TagVendor $vendor)
+    public static function create($parser, TagFactory $factory)
     {
         if (empty($parser)) {
             return null;
@@ -34,7 +34,7 @@ class Description
         if (is_string($parser)) {
             $description->text = $parser;
         } else {
-            $description->phpdoc = PhpDoc::create($parser, $vendor);
+            $description->phpdoc = PhpDoc::create($parser, $factory);
         }
 
         return $description;

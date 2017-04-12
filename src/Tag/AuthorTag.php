@@ -11,8 +11,9 @@ namespace Panlatent\Annotation\Tag;
 
 use Panlatent\Annotation\Description;
 use Panlatent\Annotation\Tag;
+use Panlatent\Annotation\TagWithoutNameFactory;
 
-final class AuthorTag extends Tag
+final class AuthorTag extends Tag implements TagWithoutNameFactory
 {
     protected $name = 'author';
 

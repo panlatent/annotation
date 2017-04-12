@@ -20,8 +20,8 @@ use Panlatent\Annotation\Parser\Token\SummaryToken;
 use Panlatent\Annotation\Parser\Token\TagDescriptionToken;
 use Panlatent\Annotation\Parser\Token\TagDetailsToken;
 use Panlatent\Annotation\Parser\Token\TagNameToken;
+use Panlatent\Annotation\Parser\Token\TagSpecializationToken;
 use Panlatent\Annotation\Parser\Token\TagToken;
-use Panlatent\Annotation\TagSpecializationInterface;
 use Panlatent\Boost\BStack;
 
 class SyntaxAnalyzer
@@ -123,7 +123,7 @@ class SyntaxAnalyzer
 
                     continue;
 
-                case TagSpecializationInterface::class:
+                case TagSpecializationToken::class:
 
                     $tag['specialization'] = $token->value;
 
@@ -143,7 +143,7 @@ class SyntaxAnalyzer
 
                 case FinalToken::class:
 
-                    if ( ! empty(['name'])) {
+                    if ( ! empty($tag['name'])) {
                         $phpdoc['tags'][] = $tag;
                     }
                     return $phpdoc;

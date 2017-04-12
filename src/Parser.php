@@ -18,21 +18,21 @@ use Panlatent\Annotation\Parser\Syntax\SyntaxAnalyzer;
 class Parser
 {
     /**
-     * @var \Panlatent\Annotation\TagVendor
+     * @var \Panlatent\Annotation\TagFactory
      */
-    protected $tagVendor;
+    protected $tagFactory;
 
     /**
      * Parser constructor.
      *
-     * @param \Panlatent\Annotation\TagVendor|null $vendor
+     * @param \Panlatent\Annotation\TagFactory|null $vendor
      */
-    public function __construct(TagVendor $vendor = null)
+    public function __construct(TagFactory $vendor = null)
     {
         if ( ! $vendor) {
-            $this->tagVendor = new TagVendor();
+            $this->tagFactory = new TagFactory();
         } else {
-            $this->tagVendor = $vendor;
+            $this->tagFactory = $vendor;
         }
     }
 
@@ -53,22 +53,22 @@ class Parser
         $lexer = new LexicalAnalyzer($scanner);
         $syntax = new SyntaxAnalyzer($lexer);
 
-        return PhpDoc::create($syntax->phpdocization(), $this->tagVendor);
+        return PhpDoc::create($syntax->phpdocization(), $this->tagFactory);
     }
 
     /**
-     * @return \Panlatent\Annotation\TagVendor
+     * @return \Panlatent\Annotation\TagFactory
      */
-    public function getTagVendor()
+    public function getTagFactory()
     {
-        return $this->tagVendor;
+        return $this->tagFactory;
     }
 
     /**
-     * @param \Panlatent\Annotation\TagVendor $tagVendor
+     * @param \Panlatent\Annotation\TagFactory $tagVendor
      */
-    public function setTagVendor($tagVendor)
+    public function setTagFactory($tagVendor)
     {
-        $this->tagVendor = $tagVendor;
+        $this->tagFactory = $tagVendor;
     }
 }

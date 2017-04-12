@@ -20,7 +20,6 @@ class ParserTest extends TestCase
         $good = require(__DIR__ . '/_data/phpdoc_good_example.php');
 
         $parser = new Parser();
-        $parser->getTagVendor()->withDeprecated();
         foreach ($good as $key => $value) {
             $phpdoc = $parser->parser($value);
             $this->assertInstanceOf(PhpDoc::class, $phpdoc);

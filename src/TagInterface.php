@@ -22,20 +22,7 @@ interface TagInterface
     const SIGN = '@';
 
     /**
-     * @return bool
-     */
-    //public function isWithSignature();
-
-    /**
      * @return string
      */
     public function getName();
-
-
-    public static function create(Description $description);
-
-    /**
-     * @return string
-     */
-    //public function getDescription();
 }

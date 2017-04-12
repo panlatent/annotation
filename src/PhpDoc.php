@@ -44,12 +44,12 @@ class PhpDoc
         }
     }
 
-    public static function create(array $parser, TagVendor $vendor)
+    public static function create(array $parser, TagFactory $factory)
     {
         return new static(
             $parser['summary'],
-            Description::create($parser['description'], $vendor),
-            TagStorage::create($parser['tags'], $vendor)
+            Description::create($parser['description'], $factory),
+            TagStorage::create($parser['tags'], $factory)
         );
     }
 
