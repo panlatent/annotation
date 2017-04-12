@@ -9,10 +9,10 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\Parser\PatternMatchFactoryInterface;
-use Panlatent\Annotation\TagAbstract;
+use Panlatent\Annotation\Description;
+use Panlatent\Annotation\Tag;
 
-final class DeprecatedTag extends TagAbstract implements PatternMatchFactoryInterface
+final class DeprecatedTag extends Tag
 {
     protected $name = 'deprecated';
 
@@ -22,15 +22,13 @@ final class DeprecatedTag extends TagAbstract implements PatternMatchFactoryInte
 
     public function __construct($version = null, $description = null)
     {
-        parent::__construct();
-
         $this->version = $version;
         $this->description = $description;
     }
 
-    public static function create($content)
+    public static function create(Description $description)
     {
-        if (empty($content)) {
+        if (empty($description->getText())) {
             return new static();
         }
         $matches = [];
@@ -45,7 +43,7 @@ final class DeprecatedTag extends TagAbstract implements PatternMatchFactoryInte
             # around the actual version vector.
             [^\s\:]+\:\s*\$[^\$]+\$
             )' . ')\s*(.+)?$/sux',
-            $content, $matches)) {
+            $description->getText(), $matches)) {
             return new static(null, null);
         }
         return new static($matches[1], isset($matches[2]) ? $matches[2] : '');

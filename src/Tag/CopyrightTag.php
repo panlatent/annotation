@@ -9,9 +9,15 @@
 
 namespace Panlatent\Annotation\Tag;
 
+use Panlatent\Annotation\Description;
 use Panlatent\Annotation\Tag;
 
 final class CopyrightTag extends Tag
 {
     protected $name = 'copyright';
+
+    public static function create(Description $description)
+    {
+        return new static($description);
+    }
 }

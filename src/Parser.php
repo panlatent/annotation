@@ -47,13 +47,13 @@ class Parser
         if ( ! $preprocessor->check($docComment)) {
             throw new ParserException('DocComment format error');
         }
-        $phpdoc = $preprocessor->preprocessor($docComment);
+        $docBlock = $preprocessor->preprocessor($docComment);
 
-        $scanner = new CharacterScanner($phpdoc);
+        $scanner = new CharacterScanner($docBlock);
         $lexer = new LexicalAnalyzer($scanner);
-        $syntax = new SyntaxAnalyzer($lexer, $this->tagVendor);
+        $syntax = new SyntaxAnalyzer($lexer);
 
-        return new PhpDoc();
+        return PhpDoc::create($syntax->phpdocization(), $this->tagVendor);
     }
 
     /**

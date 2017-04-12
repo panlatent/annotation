@@ -9,9 +9,9 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\TagAbstract;
+use Panlatent\Annotation\Tag;
 
-final class VersionTag extends TagAbstract
+final class VersionTag extends Tag
 {
 
 }

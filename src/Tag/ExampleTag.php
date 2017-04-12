@@ -9,25 +9,38 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\Parser\PatternMatchFactoryInterface;
-use Panlatent\Annotation\TagAbstract;
+use Panlatent\Annotation\Description;
+use Panlatent\Annotation\Tag;
 
-final class ExampleTag extends TagAbstract implements PatternMatchFactoryInterface
+final class ExampleTag extends Tag
 {
     protected $name = 'example';
 
     private $filePath = '';
 
-    private $isURI = false;
+    private $fileUri = '';
 
-    public function __construct($name = null)
+    private $isUri = false;
+
+    private $startingLine;
+
+    private $lineCount;
+
+    private $description;
+
+    public function __construct($filePath, $fileUri, $startingLine, $lineCount, $description)
     {
-        parent::__construct($name);
+        $this->filePath = $filePath;
+        $this->fileUri = $fileUri;
+        $this->isUri = empty($filePath);
+        $this->startingLine = $startingLine;
+        $this->lineCount = $lineCount;
+        $this->description = $description;
     }
 
-    public static function create($content)
+    public static function create(Description $description)
     {
-        if (! preg_match('/^(?:\"([^\"]+)\"|(\S+))(?:\s+(.*))?$/sux', $content, $matches)) {
+        if (! preg_match('/^(?:\"([^\"]+)\"|(\S+))(?:\s+(.*))?$/sux', $description->getText(), $matches)) {
             return null;
         }
         $filePath = null;

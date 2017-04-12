@@ -9,9 +9,9 @@
 
 namespace Tests\_support;
 
-use Panlatent\Annotation\TagAbstract;
+use Panlatent\Annotation\Tag;
 
-class ExternalTag extends TagAbstract
+class ExternalTag extends Tag
 {
 
 }

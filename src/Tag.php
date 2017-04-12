@@ -7,32 +7,41 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-/**
- * Annotation - Parsing PHPDoc style annotations from comments
- *
- * @author  panlatent@gmail.com
- * @link    https://github.com/panlatent/annotation
- * @license https://opensource.org/licenses/MIT
- */
-
 namespace Panlatent\Annotation;
 
-class Tag extends TagAbstract
+class Tag implements TagInterface
 {
+    const DEFINED_TAG_NAMESPACE = 'Panlatent\\Annotation\\Tag\\';
+    const CLASS_NAME_SUFFIX = 'Tag';
+
+    /**
+     * @var string
+     */
     protected $name;
 
+    /**
+     * @var \Panlatent\Annotation\Description
+     */
     protected $description;
 
+    /**
+     * @var bool
+     */
     protected $withSignature = false;
 
-    public function __construct($name, $description = '')
+    public static function create(Description $description)
     {
-        parent::__construct($name);
+        $class = get_called_class();
+        throw new Exception("Free tag must have a name or subclass {$class} override the static method");
     }
 
-    public static function create($name, $content)
+    public static function createFromName($name, Description $description)
     {
-        return new static($name, $content);
+        $tag = new static();
+        $tag->name = $name;
+        $tag->description = $description;
+
+        return $tag;
     }
 
     public function isWithSignature()

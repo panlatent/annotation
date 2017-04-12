@@ -31,6 +31,9 @@ interface TagInterface
      */
     public function getName();
 
+
+    public static function create(Description $description);
+
     /**
      * @return string
      */

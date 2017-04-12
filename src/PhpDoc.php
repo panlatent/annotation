@@ -17,7 +17,7 @@ class PhpDoc
     protected $summary;
 
     /**
-     * @var string
+     * @var \Panlatent\Annotation\Description
      */
     protected $description;
 
@@ -29,11 +29,11 @@ class PhpDoc
     /**
      * PhpDoc constructor.
      *
-     * @param string                                $summary
-     * @param string                                $description
-     * @param \Panlatent\Annotation\TagStorage|null $tags
+     * @param string                                   $summary
+     * @param \Panlatent\Annotation\Description|null   $description
+     * @param \Panlatent\Annotation\TagStorage|null    $tags
      */
-    public function __construct($summary = '', $description = '', TagStorage $tags = null)
+    public function __construct($summary = '', Description $description = null, TagStorage $tags = null)
     {
         $this->summary = $summary;
         $this->description = $description;
@@ -42,6 +42,15 @@ class PhpDoc
         } else {
             $this->tags = $tags;
         }
+    }
+
+    public static function create(array $parser, TagVendor $vendor)
+    {
+        return new static(
+            $parser['summary'],
+            Description::create($parser['description'], $vendor),
+            TagStorage::create($parser['tags'], $vendor)
+        );
     }
 
     /**
@@ -53,7 +62,7 @@ class PhpDoc
     }
 
     /**
-     * @return string
+     * @return \Panlatent\Annotation\Description
      */
     public function getDescription()
     {

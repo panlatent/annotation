@@ -9,9 +9,15 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\TagAbstract;
+use Panlatent\Annotation\Description;
+use Panlatent\Annotation\Tag;
 
-final class LicenseTag extends TagAbstract
+final class LicenseTag extends Tag
 {
+    protected $name = 'license';
 
+    public static function create(Description $description)
+    {
+        return new static($description);
+    }
 }

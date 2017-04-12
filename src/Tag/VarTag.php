@@ -9,9 +9,15 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\TagAbstract;
+use Panlatent\Annotation\Description;
+use Panlatent\Annotation\Tag;
 
-final class VarTag extends TagAbstract
+final class VarTag extends Tag
 {
-    protected $name = 'api';
+    protected $name = 'var';
+
+    public static function create(Description $description)
+    {
+        return new static($description);
+    }
 }

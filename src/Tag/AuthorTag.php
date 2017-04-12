@@ -9,10 +9,10 @@
 
 namespace Panlatent\Annotation\Tag;
 
-use Panlatent\Annotation\Parser\Lexical\PatternMatchFactoryInterface;
-use Panlatent\Annotation\TagAbstract;
+use Panlatent\Annotation\Description;
+use Panlatent\Annotation\Tag;
 
-final class AuthorTag extends TagAbstract implements PatternMatchFactoryInterface
+final class AuthorTag extends Tag
 {
     protected $name = 'author';
 
@@ -22,14 +22,13 @@ final class AuthorTag extends TagAbstract implements PatternMatchFactoryInterfac
 
     public function __construct($authorName, $authorEmail)
     {
-        parent::__construct();
         $this->authorName = $authorName;
         $this->authorEmail = $authorEmail;
     }
 
-    public static function create($content)
+    public static function create(Description $description)
     {
-        if ( ! preg_match('/^([^\<]*)(?:\<([^\>]*)\>)?$/u', $content, $matches)) {
+        if ( ! preg_match('/^([^\<]*)(?:\<([^\>]*)\>)?$/u', $description->getText(), $matches)) {
             return null;
         }
         $authorName = trim($matches[1]);
